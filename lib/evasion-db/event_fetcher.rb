@@ -15,7 +15,10 @@
         if db != nil
           $stdout.puts "connecting to database"
           Connection.establish_connection db
-          require 'plugins/prelude/postgres_patch.rb'
+          # TODO require postgres patch
+          # important: after connection established!!!!
+
+          #require 'plugins/prelude/postgres_patch.rb'
           @connection_established = true
         else
           raise "no evasion_db entry found in file"

@@ -6,7 +6,7 @@ module FIDIUS
     $prelude_event_fetcher.local_ip = ip
   end
 
-  def self.connect_db(config_file)
+  def self.db_connect(config_file)
     $prelude_event_fetcher.connect_db(config_file)
   end
 
