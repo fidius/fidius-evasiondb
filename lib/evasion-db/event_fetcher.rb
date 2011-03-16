@@ -1,4 +1,5 @@
-
+module FIDIUS
+  module EvasionDB
   class PreludeEventFetcher
 
     attr_accessor :local_ip
@@ -11,17 +12,23 @@
 
     def connect_db(file)
       if (File.exists? File.expand_path(file))
- 	      db = YAML.load(File.read(file))['evasion_db']
-        if db != nil
-          $stdout.puts "connecting to database"
-          Connection.establish_connection db
-          # TODO require postgres patch
-          # important: after connection established!!!!
-
-          #require 'plugins/prelude/postgres_patch.rb'
-          @connection_established = true
+ 	      evasion_db = YAML.load(File.read(file))['evasion_db']
+ 	      ids_db = YAML.load(File.read(file))['ids_db']
+        
+        unless evasion_db || ids_db
+          raise "no evasion_db or ids_db entry found in file"
         else
-          raise "no evasion_db entry found in file"
+          $stdout.puts "connecting to database"
+          Connection.establish_connection ids_db
+          EvasionDbConnection.establish_connection evasion_db
+          begin
+            Alert.first
+          rescue
+            puts $!.message
+          end
+          puts "loading #{File.join(GEM_BASE, 'evasion-db','postgres_patch.rb')}"
+          require File.join(GEM_BASE, 'patches','postgres_patch.rb')
+          @connection_established = true
         end
       else
         raise "#{file} does not exist"
@@ -55,4 +62,5 @@
       return res
     end
   end
-
+end
+end

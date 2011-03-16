@@ -26,7 +26,6 @@ module FIDIUS
           $stdout.puts "error: #{$!.inspect}:#{$!.backtrace}"
        end
       end
-
     end# module Commands
   end# module EvasionDB
 end# module FIDIUS
