@@ -6,11 +6,11 @@ Gem::Specification.new do |s|
   s.name        = "evasion-db"
   s.version     = Evasion::Db::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["TODO: Write your name"]
-  s.email       = ["TODO: Write your email address"]
-  s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.authors     = ["Jens Färber, Bernhard Katzmarski, Kai-Uwe Hanke"]
+  s.email       = ["jfaerber@tzi.de, bkatzm@tzi.de, khanke@tzi.de"]
+  s.homepage    = "http://www.fidius.me"
+  s.summary     = %q{summary here}
+  s.description = %q{description here}
 
   s.rubyforge_project = "evasion-db"
 
