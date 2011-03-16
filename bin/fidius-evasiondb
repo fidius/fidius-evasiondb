@@ -3,6 +3,8 @@ require 'optparse'
 require 'evasion-db/version'
 require 'fileutils'
 
+GEM_BASE = File.expand_path('../../lib', __FILE__)
+
 options = {}
 
 optparse = OptionParser.new do |opts|
