@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+require 'optparse'
+require 'evasion-db/version'
+require 'fileutils'
+
+options = {}
+
+optparse = OptionParser.new do |opts|
+
+  opts.banner = "Usage: evasion-db [options]"
+
+  opts.on_tail("-e", "--empty", "Initialize empty Evasion DB") do
+    puts "empty init"
+    exit
+  end
+
+  opts.on_tail("-d", "--dump-init", "Initialize Evasion DB with dumped data") do
+    puts "dump init"
+    exit
+  end
+
+  opts.on_tail("-h", "--help", "Show this message") do
+    puts "GEM_BASE=#{GEM_BASE}"
+    puts opts
+    exit
+  end
+
+  opts.on_tail("-v", "--version", "Show version") do
+    puts "FIDIUS Evasion DB, Version #{Evasion::Db::VERSION}"
+    exit
+  end
+end
