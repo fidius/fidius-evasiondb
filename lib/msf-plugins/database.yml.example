@@ -1,0 +1,23 @@
+ids_db:
+  adapter: postgresql
+  host: 10.10.10.253
+  port: 5432
+  encoding: utf8
+  database: preludemanager
+  username: preludemanager
+  password: fidius09
+  read_timeout: 5
+  write_timeout: 5
+  timeout: 1
+  pool: 1
+  retry: 3
+
+evasion_db:
+  adapter: mysql
+  host: localhost
+  port: 3306
+  encoding: utf8
+  database: evasion_db
+  username: root
+  password:
+  socket: /opt/lampp/var/mysql/mysql.sock
