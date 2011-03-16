@@ -21,12 +21,6 @@ module FIDIUS
           $stdout.puts "connecting to database"
           Connection.establish_connection ids_db
           EvasionDbConnection.establish_connection evasion_db
-          begin
-            Alert.first
-          rescue
-            puts $!.message
-          end
-          puts "loading #{File.join(GEM_BASE, 'evasion-db','postgres_patch.rb')}"
           require File.join(GEM_BASE, 'patches','postgres_patch.rb')
           @connection_established = true
         end

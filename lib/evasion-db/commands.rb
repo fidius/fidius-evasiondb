@@ -3,6 +3,7 @@ module FIDIUS
     module Commands
 
       def self.set_local_ip(ip)
+        puts "GEM EXEC: set_local_ip #{ip}"
         $prelude_event_fetcher.local_ip = ip
       end
 
