@@ -24,7 +24,5 @@ module FIDIUS
     end
 
     $prelude_event_fetcher = PreludeEventFetcher.new
-    # FIXME: only for test purpose
-    $prelude_event_fetcher.connect_db((File.join GEM_BASE, 'msf-plugins', 'database.yml.example'))
   end
 end

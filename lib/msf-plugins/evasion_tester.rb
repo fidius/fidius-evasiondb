@@ -186,16 +186,15 @@ class Plugin::EvasionTester < Msf::Plugin
 
   def initialize(framework, opts)
     super
-    # TODO require gem
     require 'evasion-db'
-    begin
-      add_console_dispatcher(ConsoleCommandDispatcher)
-      FIDIUS::PacketLogger.init_with_framework(framework)
-      FIDIUS::PacketLogger.on_log do |caused_by, data, socket|
-        FIDIUS::EvasionDB.log_packet(caused_by,data,socket)
-      end
-    rescue
-      puts "#{$!.inspect}"
+    msf_home = File.expand_path("../..",__FILE__)
+    dbconfig_path = File.join(msf_home,"data","database.yml")
+    raise "no database.yml in data/" if !File.exists?(dbconfig_path)
+    FIDIUS::EvasionDB.db_connect(dbconfig_path)
+    add_console_dispatcher(ConsoleCommandDispatcher)
+    FIDIUS::PacketLogger.init_with_framework(framework)
+    FIDIUS::PacketLogger.on_log do |caused_by, data, socket|
+      FIDIUS::EvasionDB.log_packet(caused_by,data,socket)
     end
     print_status("EvasionTester plugin loaded.")
   end

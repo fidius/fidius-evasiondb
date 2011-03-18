@@ -9,6 +9,7 @@ Gem::Specification.new do |s|
   s.authors     = ["Jens Färber, Bernhard Katzmarski, Kai-Uwe Hanke"]
   s.email       = ["jfaerber@tzi.de, bkatzm@tzi.de, khanke@tzi.de"]
   s.homepage    = "http://www.fidius.me"
+  s.add_dependency('fidius-common') 
   s.summary     = %q{summary here}
   s.description = %q{description here}
 
