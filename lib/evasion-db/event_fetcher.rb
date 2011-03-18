@@ -42,7 +42,9 @@ module FIDIUS
       raise "no connection to database" if !@connection_established
       raise "please start_attack before fetching" if @start_time == nil
       res = Array.new
+      puts "alert.find(:all,:joins=>[:detect_time],time > #{@start_time})"
       events = Alert.find(:all,:joins => [:detect_time],:order=>"time DESC",:conditions=>["time > :d",{:d => @start_time}])
+      puts "found #{events.size} events"
       events.each do |event|
         ev = PreludeEvent.new(event)
         if @local_ip != nil

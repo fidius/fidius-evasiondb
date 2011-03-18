@@ -13,4 +13,9 @@ class IdmefEvent < EvasionDbConnection
   def get_payloads_logs
     payload_logs
   end
+
+  def payload_size
+    return self[:payload].size if self[:payload]
+    return 0
+  end
 end

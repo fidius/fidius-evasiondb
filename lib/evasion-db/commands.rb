@@ -6,6 +6,14 @@ module FIDIUS
         IdmefEvent.all
       end
 
+      def self.get_event(event_id)
+        IdmefEvent.find(event_id)
+      end
+
+      def self.get_packet(pid)
+        Packet.find(pid)
+      end
+
       def self.get_packet_for_event(event_id)
         event = IdmefEvent.find(event_id)
         FIDIUS::EvasionDB::LogMatchesHelper.find_packets_for_event(event,Packet.all)
@@ -40,7 +48,12 @@ module FIDIUS
       end
 
       def self.fetch_events
-        $prelude_event_fetcher.get_events
+        events = $prelude_event_fetcher.get_events
+        events.each do |event|
+          IdmefEvent.create(:payload=>event.payload,:detect_time=>event.detect_time,
+                            :dest_ip=>event.dest_ip,:src_ip=>event.source_ip,:text=>event.text,:severity=>event.severity,
+                            :analyzer_model=>event.analyzer_model,:ident=>event.id)
+        end
       end
 
       def self.log_packet(caused_by,data,socket)

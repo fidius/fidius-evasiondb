@@ -219,9 +219,4 @@ class PreludeEvent < ActiveRecord::Base
   def messageid
     return @prelude_alert.messageid
   end
-
-  def payload_size
-    return payload.size if payload
-    return 0
-  end
 end
