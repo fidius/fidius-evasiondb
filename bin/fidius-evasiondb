@@ -5,19 +5,42 @@ require 'fileutils'
 
 GEM_BASE = File.expand_path('../../lib', __FILE__)
 
+messages = { 'root' => "Please run this script in the root directory of " +
+                   "your metasploit installation",
+             'pre-db' => "This will migrate the Evasion DB schema into the " +
+                         "database specified in MSF-ROOT/data/database.yml " +
+                         "in the section 'evasion_db'.\nPlease make sure, you " +
+                         "configured that first. Are you ready to proceed? (y/n)",
+             'empty' => "Initialize FIDIUS Evasion DB",
+             'db-config' => "If you do not have a database config in 'data/database.yml', " +
+                            "you can create an example file now. (y/n)"
+}
+
 options = {}
 
 optparse = OptionParser.new do |opts|
 
-  opts.banner = "Usage: evasion-db [options]"
+  opts.banner = "Usage: fidius-evasiondb [options]"
 
-  opts.on_tail("-e", "--empty", "Initialize empty Evasion DB") do
-    puts "empty init"
-    exit
-  end
+  opts.on_tail("-e", "--empty", "Initialize empty FIDIUS Evasion DB") do
+    puts messages['empty']
+    if in_msf_root?
+      puts "Copy files for MSF-Plugin..."
+      FileUtils.cp(File.join(GEM_BASE, 'msf-plugins', 'evasion_tester.rb'),
+                     'plugins')
+      puts messages['db-config']
+      if yes_no_dialog?
+        FileUtils.cp(File.join(GEM_BASE, 'msf-plugins', 'database.yml.example'),
+                     File.join('data', 'database.yml'))
+      end
 
-  opts.on_tail("-d", "--dump-init", "Initialize Evasion DB with dumped data") do
-    puts "dump init"
+      puts messages['pre-db']
+      if yes_no_dialog?
+        migrate_models
+      end
+    else
+      puts messages['root']
+    end
     exit
   end
 
@@ -32,3 +55,32 @@ optparse = OptionParser.new do |opts|
     exit
   end
 end
+
+def in_msf_root?
+  files = ['data', 'plugins', 'msfconsole', 'msfcli', 'msfgui', 'msfpayload']
+  files.each { |file| return false unless File.exists? file }
+
+  return true
+end
+
+def migrate_models
+  require File.join(GEM_BASE, 'db', 'db-install.rb')
+  include FIDIUS::EvasionDB
+
+  FIDIUS::EvasionDB.migrate GEM_BASE
+end
+
+def yes_no_dialog?
+  while answer = gets
+    case answer
+    when "y\n"
+      return true
+    when "n\n"
+      return false
+    else
+      puts "I don't know what you mean, enter 'y' for yes or 'n' for no."
+    end
+  end
+end
+
+optparse.parse!
