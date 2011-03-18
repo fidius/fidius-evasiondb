@@ -1,12 +1,3 @@
-require 'plugins/prelude/connection.rb'
-require 'plugins/prelude/additional_data.rb'
-require 'plugins/prelude/address.rb'
-require 'plugins/prelude/alert.rb'
-require 'plugins/prelude/analyzer.rb'
-require 'plugins/prelude/classification.rb'
-require 'plugins/prelude/detect_time.rb'
-require 'plugins/prelude/impact.rb'
-require 'plugins/prelude/service.rb'
 class PreludeEvent < ActiveRecord::Base
 
   has_many :annotated_events

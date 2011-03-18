@@ -1,4 +1,5 @@
-
+module FIDIUS
+  module EvasionDB
   class PreludeEventFetcher
 
     attr_accessor :local_ip
@@ -11,17 +12,17 @@
 
     def connect_db(file)
       if (File.exists? File.expand_path(file))
- 	      db = YAML.load(File.read(file))['evasion_db']
-        if db != nil
-          $stdout.puts "connecting to database"
-          Connection.establish_connection db
-          # TODO require postgres patch
-          # important: after connection established!!!!
-
-          #require 'plugins/prelude/postgres_patch.rb'
-          @connection_established = true
+ 	      evasion_db = YAML.load(File.read(file))['evasion_db']
+ 	      ids_db = YAML.load(File.read(file))['ids_db']
+        
+        unless evasion_db || ids_db
+          raise "no evasion_db or ids_db entry found in file"
         else
-          raise "no evasion_db entry found in file"
+          $stdout.puts "connecting to database"
+          Connection.establish_connection ids_db
+          EvasionDbConnection.establish_connection evasion_db
+          require File.join(GEM_BASE, 'patches','postgres_patch.rb')
+          @connection_established = true
         end
       else
         raise "#{file} does not exist"
@@ -41,7 +42,9 @@
       raise "no connection to database" if !@connection_established
       raise "please start_attack before fetching" if @start_time == nil
       res = Array.new
+      puts "alert.find(:all,:joins=>[:detect_time],time > #{@start_time})"
       events = Alert.find(:all,:joins => [:detect_time],:order=>"time DESC",:conditions=>["time > :d",{:d => @start_time}])
+      puts "found #{events.size} events"
       events.each do |event|
         ev = PreludeEvent.new(event)
         if @local_ip != nil
@@ -55,4 +58,5 @@
       return res
     end
   end
-
+end
+end
