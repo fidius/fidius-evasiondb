@@ -2,8 +2,32 @@ module FIDIUS
   module EvasionDB
     module Commands
 
+      def self.get_events
+        IdmefEvent.all
+      end
+
+      def self.get_packet_for_event(event_id)
+        event = IdmefEvent.find(event_id)
+        FIDIUS::EvasionDB::LogMatchesHelper.find_packets_for_event(event,Packet.all)
+      end
+
+      def self.test_get_packet
+        event = IdmefEvent.find(16)
+        packet = FIDIUS::EvasionDB::LogMatchesHelper.find_packets_for_event(event,Packet.all)
+      end
+
+
+
+      def self.test_get_event
+        event = IdmefEvent.find(16)
+
+       # puts packet.inspect
+        #Packet.first.payload
+      end
+
       def self.set_local_ip(ip)
-        puts "GEM EXEC: set_local_ip #{ip}"
+        #raise "dont need this any more"
+        #puts "GEM EXEC: set_local_ip #{ip}"
         $prelude_event_fetcher.local_ip = ip
       end
 
@@ -21,6 +45,9 @@ module FIDIUS
 
       def self.log_packet(caused_by,data,socket)
         begin
+          # set local ip, if there is no
+          $prelude_event_fetcher.local_ip = FIDIUS::Common.get_my_ip(socket.peerhost) unless $prelude_event_fetcher.local_ip
+
           Packet.create(:exploit=>caused_by, :payload=>data,:src_addr=>socket.localhost,:src_port=>socket.localport,:dest_addr=>socket.peerhost,:dest_port=>socket.peerport)
           $stdout.puts "LOG: #{caused_by} #{data.size} Bytes on #{socket}"
         rescue

@@ -30,6 +30,8 @@ class Plugin::EvasionTester < Msf::Plugin
         "fetch_events" => "fetch events which were created in the meanwhile",
         "evasion_db_connect" => "connect to an instance of prelude database",
         "set_local_ip" => "set your local ip to filter events",
+        "show_events" => "shows all fetched idmef-events",
+        "show_event" => "shows information about an idmef-event"
       }
     end
 
@@ -54,7 +56,96 @@ class Plugin::EvasionTester < Msf::Plugin
       end
     end
 
+	def to_hex_dump(str, from=1, to=3)
+    width=16
+		buf = ''
+		idx = 0
+		cnt = 0
+		snl = false
+		lst = 0
+    rclosed = true
+		while (idx < str.length)      
+			chunk = str[idx, width]
+			line  = chunk.unpack("H*")[0].scan(/../).join(" ")
+      if from >= idx && from < idx+width
+        line[(idx-from).abs*3] = "%bld%red#{line[(idx-from).abs*3]}"
+      end
+      if to >= idx && to < idx+width
+        offset = 0
+        offset = "%bld%red".length if line["%bld%red"]
+        line[(idx-to).abs*3+offset+1] = "#{line[(idx-to).abs*3+offset+1]}%clr"
+      end
+			buf << line
+
+      line_length = line.gsub("%bld%red","").gsub("%clr","").length
+			if (lst == 0)
+				lst = line_length
+				buf << " " * 4
+			else
+				buf << " " * ((lst - line_length) + 4).abs
+			end
+
+      index = 0
+			chunk.unpack("C*").each do |c|
+        if from >= idx && from < idx+width && (idx-from).abs == index || !rclosed
+          buf << "%bld%red"
+          rclosed = false
+        end
+
+				if (c >	0x1f and c < 0x7f)
+					buf << c.chr
+				else
+					buf << "."
+				end
+        if to >= idx && to < idx+width && (idx-to).abs == index
+          buf << "%clr"
+          rclosed = true
+        end
+
+        index = index+1
+			end
+			buf << "\n"
+
+			idx += width
+		end
+
+		buf << "\n"
+	end
+
+    def cmd_show_events(*args)
+      events = FIDIUS::EvasionDB::Commands.get_events
+      print_line "#{events.size} idmef-events fetched"
+      events.each do |event|
+        print_line "(#{event.id})#{event.text} with #{event.payload_size} bytes payload"
+      end
+    end
+
+    def cmd_show_event(*args)
+      raise "please provide event_id" if args.size != 1
+
+      packet = FIDIUS::EvasionDB::Commands.get_packet_for_event(args[0].to_i)
+      hex = to_hex_dump(packet[:packet].payload,packet[:index],packet[:index]+packet[:length])
+      print_line "PACKET(#{packet[:packet].id}): #{packet[:packet].payload.size} bytes"
+      print_line "match #{packet[:index]} - #{packet[:index]+packet[:length]}"
+      print_line hex      
+    end
+
+
     def cmd_start_attack(*args)
+      #p = FIDIUS::EvasionDB::Commands.test_get_payload
+      #packet = FIDIUS::EvasionDB::Commands.test_get_packet
+      #event = FIDIUS::EvasionDB::Commands.test_get_event
+
+      #hex = to_hex_dump(packet[:packet].payload,packet[:index],packet[:index]+packet[:length])
+      #print_line "PACKET(#{packet[:packet].id}): #{packet[:packet].payload.size} bytes"
+      #print_line "match #{packet[:index]} - #{packet[:index]+packet[:length]}"
+      #print_line hex
+      #print_line "----"
+      #print_line "IDMEF-Event: #{event.payload.size} bytes"
+      #hex = to_hex_dump(event.payload)
+      #print_line hex
+
+
       print_status("start attack")
       FIDIUS::EvasionDB::Commands.start_attack
     end
