@@ -1,7 +1,5 @@
 module FIDIUS
   module EvasionDB
-    module Commands
-
       def self.get_events
         IdmefEvent.all
       end
@@ -19,23 +17,7 @@ module FIDIUS
         FIDIUS::EvasionDB::LogMatchesHelper.find_packets_for_event(event,Packet.all)
       end
 
-      def self.test_get_packet
-        event = IdmefEvent.find(16)
-        packet = FIDIUS::EvasionDB::LogMatchesHelper.find_packets_for_event(event,Packet.all)
-      end
-
-
-
-      def self.test_get_event
-        event = IdmefEvent.find(16)
-
-       # puts packet.inspect
-        #Packet.first.payload
-      end
-
       def self.set_local_ip(ip)
-        #raise "dont need this any more"
-        #puts "GEM EXEC: set_local_ip #{ip}"
         $prelude_event_fetcher.local_ip = ip
       end
 
@@ -67,6 +49,5 @@ module FIDIUS
           $stdout.puts "error: #{$!.inspect}:#{$!.backtrace}"
        end
       end
-    end# module Commands
   end# module EvasionDB
 end# module FIDIUS
