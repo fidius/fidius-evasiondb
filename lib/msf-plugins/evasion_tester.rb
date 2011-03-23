@@ -32,6 +32,7 @@ class Plugin::EvasionTester < Msf::Plugin
         "set_local_ip" => "set your local ip to filter events",
         "show_events" => "shows all fetched idmef-events",
         "show_event" => "shows information about an idmef-event",
+        "show_packet" => "shows information about a packet",
         "send_packet" => "send a given packet to generate false positive",
         "send_event_payload" => "send a given payload of an idmef-event to generate false positive"
       }
@@ -147,19 +148,43 @@ class Plugin::EvasionTester < Msf::Plugin
     end
 
     def cmd_show_events(*args)
-      events = FIDIUS::EvasionDB.get_events
-      print_line "#{events.size} idmef-events fetched"
-      events.each do |event|
-        print_line "(#{event.id})#{event.text} with #{event.payload_size} bytes payload"
+      exploits = FIDIUS::EvasionDB.get_exploits
+      exploits.each do |exploit|
+        events = exploit.idmef_events
+        print_line "-"*60
+        print_line "#{exploit.name} with #{exploit.exploit_options.size} options"
+        print_line "-"*60
+        print_line "#{events.size} idmef-events fetched"
+        print_line "-"*60
+        events.each do |event|
+          print_line "(#{event.id})#{event.text} with #{event.payload_size} bytes payload"
+        end
       end
+    end
+
+    def cmd_show_packet(*args)
+      raise "please provide packet_id" if args.size != 1
+      packet = Packet.find(args[0].to_i)
+      
+      hex = to_hex_dump(packet.payload)
+      print_line hex
     end
 
     def cmd_show_event(*args)
       raise "please provide event_id" if args.size != 1
-      event = FIDIUS::EvasionDB.get_event(args[0].to_i)
-      packet = FIDIUS::EvasionDB.get_packet_for_event(args[0].to_i)
+      event_id = args[0].to_i
+      print_line "event_id:#{event_id}"
+      event = FIDIUS::EvasionDB.get_event(event_id)
+      packet = FIDIUS::EvasionDB.get_packet_for_event(event_id)
       print_line "(#{event.id}) Event(#{event.text}) : #{event.payload_size} bytes payload"
-      print_line "PACKET(#{packet[:packet].id}): #{packet[:packet].payload.size} bytes"
+      unless packet
+        print_line "no packets available"
+        return
+      end
+      print_line "#{packet.inspect}"
+      print_line "#{packet[:packet].inspect}"
+      print_line "PACKET(#{packet[:packet].id}): "
+      print_line "#{packet[:packet].payload.size} bytes"
       print_line "match #{packet[:index]} - #{packet[:index]+packet[:length]-1}"
       hex = to_hex_dump(packet[:packet].payload,packet[:index],packet[:index]+packet[:length]-1)
       print_line hex      
@@ -176,10 +201,14 @@ class Plugin::EvasionTester < Msf::Plugin
 
     def cmd_fetch_events(*args)
       events = FIDIUS::EvasionDB.fetch_events
-      print_status "#{events.size} events generated"
-      print_status
-      events.each do |e|
-        print_status "#{e}"
+      if events
+        print_status "#{events.size} events generated"
+        print_status
+        events.each do |e|
+          print_status "#{e}"
+        end
+      else
+        print_status "0 events generated"
       end
     end
   end
@@ -187,15 +216,22 @@ class Plugin::EvasionTester < Msf::Plugin
   def initialize(framework, opts)
     super
     require 'evasion-db'
-    msf_home = File.expand_path("../..",__FILE__)
-    dbconfig_path = File.join(msf_home,"data","database.yml")
-    raise "no database.yml in data/" if !File.exists?(dbconfig_path)
-    FIDIUS::EvasionDB.db_connect(dbconfig_path)
-    add_console_dispatcher(ConsoleCommandDispatcher)
-    FIDIUS::PacketLogger.init_with_framework(framework)
-    FIDIUS::PacketLogger.on_log do |caused_by, data, socket|
-      FIDIUS::EvasionDB.log_packet(caused_by,data,socket)
-    end
+    #begin
+      # FIXME: only for test purpose
+      #$prelude_event_fetcher.connect_db((File.join GEM_BASE, 'msf-plugins', 'database.yml.example'))
+      msf_home = File.expand_path("../..",__FILE__)
+      dbconfig_path = File.join(msf_home,"data","database.yml")
+      raise "no database.yml in #{dbconfig_path}" if !File.exists?(dbconfig_path)
+      FIDIUS::EvasionDB.db_connect(dbconfig_path)
+      add_console_dispatcher(ConsoleCommandDispatcher)
+      framework.events.add_general_subscriber(FIDIUS::ModuleRunCallback.new)
+      FIDIUS::PacketLogger.init_with_framework(framework)
+      FIDIUS::PacketLogger.on_log do |caused_by, data, socket|
+        FIDIUS::EvasionDB.log_packet(caused_by,data,socket)
+      end
+    #rescue
+    #  puts "#{$!.inspect}"
+    #end
     print_status("EvasionTester plugin loaded.")
   end
 
@@ -220,10 +256,10 @@ class PacketLogger
     $block = block
   end
 
-  def self.log_packet(socket,data,caused_by="")
+  def self.log_packet(socket,data,module_instance=nil)
     begin
       #PUT HERE IS RESPONSIBLE FOR NO SESSION ? $stdout.puts "log payload #{caused_by} #{data.size} bytes"
-      $block.call caused_by, data, socket
+      $block.call module_instance, data, socket
     rescue
       #PUT HERE IS RESPONSIBLE FOR NO SESSION ? $stdout.puts "ERROR #{$!}:#{$!.backtract}"
     end
@@ -260,6 +296,28 @@ class PacketLogger
 	  Rex::Socket::Comm::Local.deregister_event_handler($eh)
   end
 end #PacketLogger
+
+class ModuleRunCallback
+  def on_module_run(instance)
+    FIDIUS::EvasionDB.module_started(instance)
+    #puts "RPORT is: #{instance.datastore["RPORT"]}"
+    #puts "run instance: #{instance.inspect}"
+  end
+	#
+	# Called when a module finishes
+	#
+	def on_module_complete(instance)
+    FIDIUS::EvasionDB.module_completed(instance)
+	end
+
+	#
+	# Called when a module raises an exception
+	#
+	def on_module_error(instance, exception)
+    FIDIUS::EvasionDB.module_error(instance,exception)
+	end
+end #class ModuleRunCallback
+
 end #FIDIUS
 
 # This extends the PacketDispatcher from Rex
@@ -304,9 +362,14 @@ module SocketTracer
 
   # Hook the write method
   def write(buf, opts = {})
-    caused_by = "unknown"
-    caused_by = context['MsfExploit'].fullname if context['MsfExploit']
-    FIDIUS::PacketLogger.log_packet(self,buf,caused_by)
+    #caused_by = "unknown"
+
+    # context['MsfExploit'] - name
+    #$stdout.puts "HALLO: "+context['MsfExploit'].inspect    
+    #module_instance = context['MsfExploit'].fullname if context['MsfExploit']
+    module_instance = context['MsfExploit'] if context['MsfExploit']
+    FIDIUS::PacketLogger.log_packet(self,buf,module_instance)
+
 	  super(buf, opts)
   end
 

@@ -31,6 +31,7 @@ module FIDIUS
       return {:packet=>packet,:index=>packet.payload.index(event.payload),:length=>event.payload.size} if str != nil
       #return str if str != nil
     end
+    nil
   end
 
 end

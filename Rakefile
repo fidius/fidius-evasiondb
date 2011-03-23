@@ -1,7 +1,7 @@
 require 'bundler'
 Bundler::GemHelper.install_tasks
 
-TEST_FILE = File.join('test', 'test_test.rb')
+TEST_FILE = File.join('test', 'exploit_test.rb')
 
 namespace :evasiondb do
   desc 'Test functionality of the gem.'

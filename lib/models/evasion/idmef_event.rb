@@ -1,5 +1,5 @@
 class IdmefEvent < EvasionDbConnection
-  has_many :payload_logs
+  belongs_to :exploit
 
   def self.table_name
     "idmef_events"
