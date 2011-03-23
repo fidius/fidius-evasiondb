@@ -368,6 +368,19 @@ module SocketTracer
     #$stdout.puts "HALLO: "+context['MsfExploit'].inspect    
     #module_instance = context['MsfExploit'].fullname if context['MsfExploit']
     module_instance = context['MsfExploit'] if context['MsfExploit']
+    #if buf["IPC"] != nil
+    #  $stdout.puts "found IPC packet and replacing"
+    #  buf = Rex::Text.hex_to_raw(Rex::Text.to_hex(buf).gsub("\\x49","\\x49\\x00").gsub("\\x50","\\x50\\x00").gsub("\\x43","\\x43\\x00"))
+    #end
+
+    # ET EXPLOIT x86 JmpCallAdditive Encoder)
+    #jmp_call_exploit = "\\xeb\\x0c\\x5e\\x56\\x31\\x1e\\xad\\x01\\xc3\\x85\\xc0\\x75\\xf7\\xc3\\xe8\\xef\\xff\\xff\\xff"
+    #jmp_evasion = "\\xec\\x0c\\x5e\\x56\\x31\\x1e\\xad\\x01\\xc3\\x85\\xc0\\x75\\xf7\\xc3\\xe8\\xef\\xff\\xff\\xff"
+    #if Rex::Text.to_hex(buf)[jmp_call_exploit]
+    #  $stdout.puts "found jumpcalladditive exploit and replacing"
+    #  buf = Rex::Text.hex_to_raw(Rex::Text.to_hex(buf).gsub(jmp_call_exploit,jmp_evasion))
+    #  #"\\xeb\\x0c\\x5e\\x56\\x31\\x1e\\xad\\x01\\xc3\\x85\\xc0\\x75\\xf7\\xc3\\xe8\\xef\\xff\\xff\\xff"
+    #end
     FIDIUS::PacketLogger.log_packet(self,buf,module_instance)
 
 	  super(buf, opts)

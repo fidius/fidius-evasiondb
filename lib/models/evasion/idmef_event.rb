@@ -1,5 +1,6 @@
 class IdmefEvent < EvasionDbConnection
   belongs_to :exploit
+  belongs_to :exploit_payload
 
   def self.table_name
     "idmef_events"
@@ -8,10 +9,6 @@ class IdmefEvent < EvasionDbConnection
   def payload
     return [] if self[:payload] == nil
     self[:payload]
-  end
-
-  def get_payloads_logs
-    payload_logs
   end
 
   def payload_size
