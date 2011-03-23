@@ -26,12 +26,15 @@ optparse = OptionParser.new do |opts|
     puts messages['empty']
     if in_msf_root?
       puts "Copy files for MSF-Plugin..."
-      FileUtils.cp(File.join(GEM_BASE, 'msf-plugins', 'evasion_tester.rb'),
-                     'plugins')
+      plugin_source = File.join(GEM_BASE, 'msf-plugins', 'evasion_tester.rb')
+      FileUtils.cp(plugin_source, 'plugins')
+      puts "Copied plugin to 'plugins/evasion_tester.rb'"
+
       puts messages['db-config']
       if yes_no_dialog?
-        FileUtils.cp(File.join(GEM_BASE, 'msf-plugins', 'database.yml.example'),
-                     File.join('data', 'database.yml'))
+        db_source = File.join(GEM_BASE, 'msf-plugins', 'database.yml.example')
+        FileUtils.cp(db_source, File.join('data', 'database.yml'))
+        puts "Copied sample database configuration file to data/database.yml"
       end
 
       puts messages['pre-db']
