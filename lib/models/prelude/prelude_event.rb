@@ -75,8 +75,7 @@ class PreludeEvent < ActiveRecord::Base
   end
 
   def detect_time
-   res = @prelude_alert.detect_time.time
-   return res unless @prelude_alert.nil?
+   return @prelude_alert.detect_time.time unless @prelude_alert.nil?
    return "No Ref"
   end
   def text
