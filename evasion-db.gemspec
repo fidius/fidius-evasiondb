@@ -3,13 +3,13 @@ $:.push File.expand_path("../lib", __FILE__)
 require "evasion-db/version"
 
 Gem::Specification.new do |s|
-  s.name        = "evasion-db"
+  s.name        = "fidius-evasiondb"
   s.version     = Evasion::Db::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Jens Färber, Bernhard Katzmarski, Kai-Uwe Hanke"]
   s.email       = ["jfaerber@tzi.de, bkatzm@tzi.de, khanke@tzi.de"]
   s.homepage    = "http://www.fidius.me"
-  s.add_dependency('fidius-common') 
+  s.add_dependency('fidius-common')
   s.summary     = %q{summary here}
   s.description = %q{description here}
 
