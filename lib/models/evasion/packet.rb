@@ -1,5 +1,6 @@
 class Packet < EvasionDbConnection
   belongs_to :exploit
+  belongs_to :exploit_payload
 
   def self.table_name
     "packets"
