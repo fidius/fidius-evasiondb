@@ -8,22 +8,35 @@ require 'db/db-install'
 
 module FIDIUS
   module EvasionDB
+    def run_tests
+      $prelude_event_fetcher = PreludeEventFetcher.new
+      $prelude_event_fetcher.connect_db(File.join(TEST_DIR, 'config', 'database.yml'))
+      self.prepare_test_db
+      #self.fill_db_with_values
+
+      #load and run all tests form subdir
+      Dir.glob(File.join TEST_DIR, 'test_modules', '*.rb') do |rb|
+        require rb
+      end
+    end
+
     def prepare_test_db
-      puts "TEST_DIR: #{TEST_DIR}"
-      puts "LIB_DIR: #{LIB_DIR}"
 
       db_config_path = File.join(TEST_DIR, 'config')
       migrations_path = File.join(LIB_DIR, 'db', 'migrations')
 
-      puts "db_config_path: #{db_config_path}"
-      puts "migrations_path: #{migrations_path}"
+      puts "Database configuration path: #{db_config_path}"
+      puts "Migrations path: #{migrations_path}"
 
       #delete and migrate new test db
       FIDIUS::EvasionDB.migrate(migrations_path, db_config_path)
+    end
 
+    def fill_db_with_values
+      # fill db with example values (use previous tests?)
     end
   end
 end
 
 include FIDIUS::EvasionDB
-FIDIUS::EvasionDB.prepare_test_db
+FIDIUS::EvasionDB.run_tests
