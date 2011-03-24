@@ -5,13 +5,13 @@ $LOAD_PATH.unshift LIB_DIR
 require 'evasion-db'
 require 'test/unit'
 require 'db/db-install'
+require "#{TEST_DIR}/factories"
 
 module FIDIUS
   module EvasionDB
     def run_tests
       self.prepare_test_db
 
-      $prelude_event_fetcher = PreludeEventFetcher.new
       $prelude_event_fetcher.connect_db(File.join(TEST_DIR, 'config', 'database.yml'))
       #self.fill_db_with_values
 
@@ -19,6 +19,8 @@ module FIDIUS
       Dir.glob(File.join TEST_DIR, 'test_modules', '*.rb') do |rb|
         require rb
       end
+      user = Factory.create(:exploit)
+      puts user.inspect
     end
 
     def prepare_test_db
