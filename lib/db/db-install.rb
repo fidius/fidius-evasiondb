@@ -43,6 +43,8 @@ module FIDIUS
     # copied and modified activerecord-3.0.4/lib/active_record/railties/database.rake
     def drop_database(config)
       case config['adapter']
+      when /sqlite/
+        FileUtils.rm (config['database'])
       when /mysql/
         ActiveRecord::Base.establish_connection(config)
         ActiveRecord::Base.connection.drop_database config['database']
