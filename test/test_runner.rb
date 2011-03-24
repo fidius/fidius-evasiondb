@@ -9,9 +9,10 @@ require 'db/db-install'
 module FIDIUS
   module EvasionDB
     def run_tests
+      self.prepare_test_db
+
       $prelude_event_fetcher = PreludeEventFetcher.new
       $prelude_event_fetcher.connect_db(File.join(TEST_DIR, 'config', 'database.yml'))
-      self.prepare_test_db
       #self.fill_db_with_values
 
       #load and run all tests form subdir
