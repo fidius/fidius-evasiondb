@@ -19,8 +19,6 @@ module FIDIUS
       Dir.glob(File.join TEST_DIR, 'test_modules', '*.rb') do |rb|
         require rb
       end
-      user = Factory.create(:exploit)
-      puts user.inspect
     end
 
     def prepare_test_db
