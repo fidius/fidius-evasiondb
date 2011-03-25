@@ -1,6 +1,6 @@
 # FIDIUS fidius-evasiondb
 
-The FIDIUS Evasion-DB Gem is used to ...
+The FIDIUS Evasion-DB Gem provides a database which contains knowledge about metasploit exploits and their corresponding Alert-Events produced by Intrusion Detection Systems (IDS). It includes a Metasploit plugin which supports the recording of thrown alerts during the execution of an exploit.
 
 Description
 
@@ -45,7 +45,7 @@ There are two possibilities to use this Gem, either inside the Metasploit consol
 
 ### From external script
 
-* rquire gem, connect_db
+* require gem, connect_db
 * Only queries possible
 
 ### Queries
