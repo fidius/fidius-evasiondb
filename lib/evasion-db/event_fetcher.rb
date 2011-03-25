@@ -22,8 +22,8 @@ module FIDIUS
           Connection.establish_connection ids_db
           EvasionDbConnection.establish_connection evasion_db
 
-          raise "could not connect to evasion_db" unless Connection.connected?
-          raise "could not connect to ids_db" unless EvasionDbConnection.connected?
+          Connection.connection
+          EvasionDbConnection.connection
 
           require File.join(GEM_BASE, 'patches','postgres_patch.rb')
           @connection_established = true
