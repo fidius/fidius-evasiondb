@@ -1,0 +1,19 @@
+evasion_db:
+  adapter: sqlite3
+  database: test/config/test.sqlite3
+  pool: 5
+  timeout: 5000
+
+ids_db:
+  adapter: postgresql
+  host: 10.10.10.253
+  port: 5432
+  encoding: utf8
+  database: preludemanager
+  username: preludemanager
+  password: fidius09
+  read_timeout: 5
+  write_timeout: 5
+  timeout: 1
+  pool: 1
+  retry: 3

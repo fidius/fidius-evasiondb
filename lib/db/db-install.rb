@@ -5,13 +5,11 @@ require 'logger'
 module FIDIUS
   module EvasionDB
 
-    def self.migrate base_path
-      @WD = Dir.pwd
-
-      @CFG_D = File.join @WD, 'data'
+    def self.migrate migrations_path, db_config_path
+      @CFG_D = db_config_path
 
       self.connection_data
-      puts @connection_data
+
       begin
         self.drop_database @connection_data
       rescue
@@ -21,12 +19,11 @@ module FIDIUS
       self.create_database @connection_data
 
       self.with_db do
-        ActiveRecord::Migrator.migrate("#{base_path}/db/migrations", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
+        ActiveRecord::Migrator.migrate(migrations_path, ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
       end
     end
 
     def connection_data
-      Dir.chdir(@WD)
       @connection_data ||= YAML.load_file("#{@CFG_D}/database.yml")['evasion_db']
     end
 
@@ -46,6 +43,8 @@ module FIDIUS
     # copied and modified activerecord-3.0.4/lib/active_record/railties/database.rake
     def drop_database(config)
       case config['adapter']
+      when /sqlite/
+        FileUtils.rm (config['database'])
       when /mysql/
         ActiveRecord::Base.establish_connection(config)
         ActiveRecord::Base.connection.drop_database config['database']

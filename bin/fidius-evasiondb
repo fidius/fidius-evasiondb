@@ -70,7 +70,9 @@ def migrate_models
   require File.join(GEM_BASE, 'db', 'db-install.rb')
   include FIDIUS::EvasionDB
 
-  FIDIUS::EvasionDB.migrate GEM_BASE
+  migrations_path = File.join(GEM_BASE, 'db', 'migrations')
+  db_config_path = File.join(Dir.pwd, 'data')
+  FIDIUS::EvasionDB.migrate(migrations_path, db_config_path)
 end
 
 def yes_no_dialog?
