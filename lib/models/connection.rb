@@ -1,3 +1,5 @@
-class EvasionDbConnection < ActiveRecord::Base
+module FIDIUS::EvasionDB::Models
+  class Connection < ActiveRecord::Base
 
-end
+  end
+end 
