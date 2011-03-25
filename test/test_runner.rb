@@ -2,7 +2,7 @@ TEST_DIR = File.dirname(File.expand_path(__FILE__))
 LIB_DIR = File.join(TEST_DIR, '..', 'lib')
 
 $LOAD_PATH.unshift LIB_DIR
-require 'evasion-db'
+require 'fidius-evasiondb'
 require 'test/unit'
 require 'db/db-install'
 require "#{TEST_DIR}/factories"
