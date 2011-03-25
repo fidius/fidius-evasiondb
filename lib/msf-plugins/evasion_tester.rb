@@ -60,7 +60,6 @@ class Plugin::EvasionTester < Msf::Plugin
     end
 
 	def to_hex_dump(str, from=-1, to=-1)
-    puts "to_hex_dump(from:#{from},to:#{to})"
     width=16
 		buf = ''
 		idx = 0
@@ -72,7 +71,6 @@ class Plugin::EvasionTester < Msf::Plugin
 			chunk = str[idx, width]
 			line  = chunk.unpack("H*")[0].scan(/../).join(" ")
       if from >= idx && from < idx+width
-        puts "index_start:#{((idx-from).abs*3)}"
         line[(idx-from).abs*3] = "%bld%red#{line[(idx-from).abs*3]}"
       end
       if to >= idx && to < idx+width
@@ -124,14 +122,12 @@ class Plugin::EvasionTester < Msf::Plugin
 	end
 
     def send_payload_to_host(payload,host,port)
-      puts "sending #{payload.size} Bytes to #{host}:#{port}"
       begin
         c = Rex::Socket.create_tcp('PeerHost'=>host,'PeerPort' => port)
         c.write(payload)
-        
         c.close
       rescue
-        puts "ERROR:#{$!} in #{$!.backtrace}"
+        print_error "#{$!} in #{$!.backtrace}"
       end
     end
 
@@ -216,22 +212,16 @@ class Plugin::EvasionTester < Msf::Plugin
   def initialize(framework, opts)
     super
     require 'evasion-db'
-    #begin
-      # FIXME: only for test purpose
-      #$prelude_event_fetcher.connect_db((File.join GEM_BASE, 'msf-plugins', 'database.yml.example'))
-      msf_home = File.expand_path("../..",__FILE__)
-      dbconfig_path = File.join(msf_home,"data","database.yml")
-      raise "no database.yml in #{dbconfig_path}" if !File.exists?(dbconfig_path)
-      FIDIUS::EvasionDB.db_connect(dbconfig_path)
-      add_console_dispatcher(ConsoleCommandDispatcher)
-      framework.events.add_general_subscriber(FIDIUS::ModuleRunCallback.new)
-      FIDIUS::PacketLogger.init_with_framework(framework)
-      FIDIUS::PacketLogger.on_log do |caused_by, data, socket|
-        FIDIUS::EvasionDB.log_packet(caused_by,data,socket)
-      end
-    #rescue
-    #  puts "#{$!.inspect}"
-    #end
+    msf_home = File.expand_path("../..",__FILE__)
+    dbconfig_path = File.join(msf_home,"data","database.yml")
+    raise "no database.yml in #{dbconfig_path}" if !File.exists?(dbconfig_path)
+    FIDIUS::EvasionDB.db_connect(dbconfig_path)
+    add_console_dispatcher(ConsoleCommandDispatcher)
+    framework.events.add_general_subscriber(FIDIUS::ModuleRunCallback.new)
+    FIDIUS::PacketLogger.init_with_framework(framework)
+    FIDIUS::PacketLogger.on_log do |caused_by, data, socket|
+      FIDIUS::EvasionDB.log_packet(caused_by,data,socket)
+    end
     print_status("EvasionTester plugin loaded.")
   end
 
@@ -258,7 +248,6 @@ class PacketLogger
 
   def self.log_packet(socket,data,module_instance=nil)
     begin
-      #PUT HERE IS RESPONSIBLE FOR NO SESSION ? $stdout.puts "log payload #{caused_by} #{data.size} bytes"
       $block.call module_instance, data, socket
     rescue
       #PUT HERE IS RESPONSIBLE FOR NO SESSION ? $stdout.puts "ERROR #{$!}:#{$!.backtract}"
@@ -300,8 +289,6 @@ end #PacketLogger
 class ModuleRunCallback
   def on_module_run(instance)
     FIDIUS::EvasionDB.module_started(instance)
-    #puts "RPORT is: #{instance.datastore["RPORT"]}"
-    #puts "run instance: #{instance.inspect}"
   end
 	#
 	# Called when a module finishes
@@ -362,11 +349,6 @@ module SocketTracer
 
   # Hook the write method
   def write(buf, opts = {})
-    #caused_by = "unknown"
-
-    # context['MsfExploit'] - name
-    #$stdout.puts "HALLO: "+context['MsfExploit'].inspect    
-    #module_instance = context['MsfExploit'].fullname if context['MsfExploit']
     module_instance = context['MsfExploit'] if context['MsfExploit']
     #if buf["IPC"] != nil
     #  $stdout.puts "found IPC packet and replacing"

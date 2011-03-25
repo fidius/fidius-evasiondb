@@ -90,7 +90,7 @@ module FIDIUS
       begin
         # set local ip, if there is no
         $prelude_event_fetcher.local_ip = FIDIUS::Common.get_my_ip(socket.peerhost) unless $prelude_event_fetcher.local_ip
-        puts "logged module_instance: #{module_instance}"
+        $logger.debug "logged module_instance: #{module_instance} with #{data.size} bytes payload"
         # TODO: what shall we do with meterpreter? 
         # it has not options and no fullname, logger assigns only the string "meterpreter"
         if module_instance.respond_to?("fullname")
@@ -101,15 +101,16 @@ module FIDIUS
         # meterpreter is not a module and does not respond to fullname 
         # we handle this seperatly
         elsif module_instance == "Meterpreter"
-          puts "module_instance is meterpreter"
-          puts "putting package to exploit_payload"
+          $logger.debug "module_instance is meterpreter"
+          $logger.debug "putting package to exploit_payload"
           $current_exploit.exploit_payload.packets << Packet.create(:payload=>data,:src_addr=>socket.localhost,:src_port=>socket.localport,:dest_addr=>socket.peerhost,:dest_port=>socket.peerport)
-          puts $current_exploit.exploit_payload.packets.inspect
           $current_exploit.save
         end
-        $stdout.puts "LOG: #{module_instance} #{data.size} Bytes on #{socket}"
-      rescue
-        $stdout.puts "error: #{$!.inspect}:#{$!.backtrace}"
+        $logger.debug "LOG: #{module_instance} #{data.size} Bytes on #{socket}"
+      rescue ActiveRecord::StatementInvalid
+        $logger.error "#{$!.message}"
+      rescue 
+        $logger.error "error: #{$!.inspect}:#{$!.backtrace}"
       end
     end
   end# module EvasionDB

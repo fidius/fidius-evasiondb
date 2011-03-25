@@ -1,5 +1,3 @@
-puts ">> Loading Postgres patch"
-
 module ActiveRecord
   module ConnectionAdapters
     class PostgreSQLAdapter < AbstractAdapter

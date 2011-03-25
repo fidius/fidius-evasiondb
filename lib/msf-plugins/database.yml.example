@@ -6,8 +6,9 @@ ids_db:
   database: preludemanager
   username: preludemanager
   password: fidius09
-  read_timeout: 5
-  write_timeout: 5
+  read_timeout: 1
+  write_timeout: 1
+  wait_timeout: 1
   timeout: 1
   pool: 1
   retry: 3

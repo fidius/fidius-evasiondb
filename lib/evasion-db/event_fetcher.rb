@@ -11,6 +11,7 @@ module FIDIUS
     end
 
     def connect_db(file)
+      $logger.debug "trying to connect to db with #{file} as config"
       if (File.exists? File.expand_path(file))
  	      evasion_db = YAML.load(File.read(file))['evasion_db']
  	      ids_db = YAML.load(File.read(file))['ids_db']
@@ -18,11 +19,12 @@ module FIDIUS
         unless evasion_db || ids_db
           raise "no evasion_db or ids_db entry found in file"
         else
-          $stdout.puts "connecting to database"
           Connection.establish_connection ids_db
           EvasionDbConnection.establish_connection evasion_db
 
+          $logger.debug "connecting to ids_db"
           Connection.connection
+          $logger.debug "connecting to ids_db"
           EvasionDbConnection.connection
 
           require File.join(GEM_BASE, 'patches','postgres_patch.rb')
@@ -46,16 +48,14 @@ module FIDIUS
       raise "no connection to database" if !@connection_established
       raise "please start_attack before fetching" if @start_time == nil
       res = Array.new
-      puts "alert.find(:all,:joins=>[:detect_time],time > #{@start_time})"
+      $logger.debug "alert.find(:all,:joins=>[:detect_time],time > #{@start_time})"
       events = Alert.find(:all,:joins => [:detect_time],:order=>"time DESC",:conditions=>["time > :d",{:d => @start_time}])
-      puts "found #{events.size} events"
+      $logger.debug "found #{events.size} events"
       events.each do |event|
         ev = PreludeEvent.new(event)
-        if @local_ip != nil
-          if ev.source_ip == @local_ip || ev.dest_ip == @local_ip
-            res << ev
-          end
-        else
+        $logger.debug "Event #{ev.source_ip} -> #{ev.dest_ip}  local_ip:#{@local_ip}"
+        if ev.source_ip == @local_ip || ev.dest_ip == @local_ip
+          $logger.debug "adding #{ev.inspect} to events "
           res << ev
         end
       end
