@@ -13,17 +13,12 @@ module FIDIUS
     require (File.join GEM_BASE, 'evasion-db','finders.rb')
     require (File.join GEM_BASE, 'evasion-db','event_fetcher.rb')
 
-
-    # Your code goes here...
-
     Dir.glob(File.join GEM_BASE, 'evasion-db', '*.rb') do |rb|
       require rb
     end
-    #require (File.join GEM_BASE, 'models', 'prelude','connection.rb')
-    #Dir.glob(File.join GEM_BASE, 'models', 'prelude', '*.rb') do |rb|
-    #  require rb
-    #end
+
     require (File.join GEM_BASE, 'idmef-fetchers','fetchers.rb')
+    FIDIUS::EvasionDB.install_fetchers
 
     require (File.join GEM_BASE, 'models', 'evasion','evasion_db_connection.rb')
     Dir.glob(File.join GEM_BASE, 'models', 'evasion', '*.rb') do |rb|
