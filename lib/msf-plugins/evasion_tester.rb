@@ -211,7 +211,7 @@ class Plugin::EvasionTester < Msf::Plugin
 
   def initialize(framework, opts)
     super
-    require 'evasion-db'
+    require 'fidius-evasiondb'
     msf_home = File.expand_path("../..",__FILE__)
     dbconfig_path = File.join(msf_home,"data","database.yml")
     raise "no database.yml in #{dbconfig_path}" if !File.exists?(dbconfig_path)
@@ -382,3 +382,5 @@ module SocketTracer
   end
 end #SocketTracer
 end #FIDIUS
+
+
