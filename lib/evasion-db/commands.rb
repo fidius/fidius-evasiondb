@@ -1,7 +1,7 @@
 module FIDIUS
   module EvasionDB
     def self.config(yml_file)
-      raise "#{file} does not exist" unless File.exists? File.expand_path(file)
+      raise "#{yml_file} does not exist" unless File.exists? File.expand_path(yml_file)
       yml_config = YAML.load(File.read(yml_file))
       evasion_db = yml_config['evasion_db']
       unless evasion_db

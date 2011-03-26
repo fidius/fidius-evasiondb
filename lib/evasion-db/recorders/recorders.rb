@@ -1,17 +1,17 @@
 module FIDIUS
   module EvasionDB
-    def self.fetcher(name,&block)
-      FIDIUS::EvasionDB::Fetcher.new(name,&block)
+    def self.recorder(name,&block)
+      FIDIUS::EvasionDB::Recorder.new(name,&block)
     end
 
-    def self.install_fetchers
-      $logger.debug "installing fetchers"
-      FIDIUS::EvasionDB::Fetcher.all.each do |fetcher|
-        fetcher.run_install
+    def self.install_recorders
+      $logger.debug "installing recoders"
+      FIDIUS::EvasionDB::Recorder.all.each do |recorder|
+        recorder.run_install
       end
     end
 
-    class Fetcher
+    class Recorder
       @@fetchers = []
       def initialize(name,&block)
         self.instance_eval(&block)
@@ -30,18 +30,6 @@ module FIDIUS
         @install.call
       end
 
-      def config(conf)
-        raise "overwrite this"
-      end
-
-      def begin_record
-        raise "overwrite this"
-      end
-
-      def get_events
-        raise "overwrite this"
-      end
-
       def self.all
         @@fetchers
       end
@@ -49,7 +37,7 @@ module FIDIUS
   end
 end
 
-Dir[File.join(File.dirname(__FILE__), "*/fetcher.rb")].each{|fetch_require|
+Dir[File.join(File.dirname(__FILE__), "*/recorder.rb")].each{|fetch_require|
   $logger.debug "load #{fetch_require}"
   require fetch_require
 } 

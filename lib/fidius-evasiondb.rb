@@ -18,9 +18,13 @@ module FIDIUS
     Dir.glob(File.join GEM_BASE, 'evasion-db','knowledge', '*.rb') do |rb|
       require rb
     end
-
+    # install fetchers
     require (File.join GEM_BASE, 'evasion-db','idmef-fetchers','fetchers.rb')
     FIDIUS::EvasionDB.install_fetchers
+
+    # install fetchers
+    require (File.join GEM_BASE, 'evasion-db','recoders','recoders.rb')
+    FIDIUS::EvasionDB.install_recorders
 
     #require (File.join GEM_BASE, 'models', 'evasion','evasion_db_connection.rb')
     #Dir.glob(File.join GEM_BASE, 'models', 'evasion', '*.rb') do |rb|
