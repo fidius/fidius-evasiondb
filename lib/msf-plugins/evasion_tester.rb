@@ -26,10 +26,10 @@ class Plugin::EvasionTester < Msf::Plugin
 
     def commands
       {
-        "start_attack" => "indicate that you want to collect all events from Time.now on",
+      #  "start_attack" => "indicate that you want to collect all events from Time.now on",
         "fetch_events" => "fetch events which were created in the meanwhile",
-        "evasion_db_connect" => "connect to an instance of prelude database",
-        "set_local_ip" => "set your local ip to filter events",
+       # "evasion_db_connect" => "connect to an instance of prelude database",
+       # "set_local_ip" => "set your local ip to filter events",
         "show_events" => "shows all fetched idmef-events",
         "show_event" => "shows information about an idmef-event",
         "show_packet" => "shows information about a packet",
@@ -38,26 +38,26 @@ class Plugin::EvasionTester < Msf::Plugin
       }
     end
 
-    def cmd_set_local_ip(*args)
-      raise "example: set_local_ip 10.0.0.100" if args.size != 1
-      FIDIUS::EvasionDB.set_local_ip(args[0])
-    end
+    #def cmd_set_local_ip(*args)
+    #  raise "example: set_local_ip 10.0.0.100" if args.size != 1
+    #  FIDIUS::EvasionDB.set_local_ip(args[0])
+    #end
 
-    def cmd_evasion_db_connect(*args)
-      if args.size == 0
-        # error no path to database.yml
-        print_error("no args given")
-        explain_db_connection
-      else
-        file = args[0]
-        begin
-          FIDIUS::EvasionDB.db_connect(file)
-        rescue
-          print_error($!)
-          explain_db_connection
-        end
-      end
-    end
+    #def cmd_evasion_db_connect(*args)
+    #  if args.size == 0
+    #    # error no path to database.yml
+    #    print_error("no args given")
+    #    explain_db_connection
+    #  else
+    #    file = args[0]
+    #    begin
+    #      FIDIUS::EvasionDB.db_connect(file)
+    #    rescue
+    #      print_error($!)
+    #      explain_db_connection
+    #    end
+    #  end
+    #end
 
 	def to_hex_dump(str, from=-1, to=-1)
     width=16
@@ -133,18 +133,18 @@ class Plugin::EvasionTester < Msf::Plugin
 
     def cmd_send_packet(*args)
       raise "please provide packet id" if args.size != 1
-      packet = FIDIUS::EvasionDB.get_packet(args[0].to_i)
+      packet = FIDIUS::EvasionDB::Knowledge.get_packet(args[0].to_i)
       send_payload_to_host(packet.payload,packet.dest_addr,packet.dest_port)
     end
 
     def cmd_send_event_payload(*args)
       raise "please provide packet id" if args.size != 1
-      event = FIDIUS::EvasionDB.get_event(args[0].to_i)
+      event = FIDIUS::EvasionDB::Knowledge.get_event(args[0].to_i)
       send_payload_to_host(event.payload,event.dest_ip,445)
     end
 
     def cmd_show_events(*args)
-      exploits = FIDIUS::EvasionDB.get_exploits
+      exploits = FIDIUS::EvasionDB::Knowledge.get_exploits
       exploits.each do |exploit|
         events = exploit.idmef_events
         print_line "-"*60
@@ -160,7 +160,7 @@ class Plugin::EvasionTester < Msf::Plugin
 
     def cmd_show_packet(*args)
       raise "please provide packet_id" if args.size != 1
-      packet = Packet.find(args[0].to_i)
+      packet = FIDIUS::EvasionDB::Knowledge::Packet.find(args[0].to_i)
       
       hex = to_hex_dump(packet.payload)
       print_line hex
@@ -170,8 +170,8 @@ class Plugin::EvasionTester < Msf::Plugin
       raise "please provide event_id" if args.size != 1
       event_id = args[0].to_i
       print_line "event_id:#{event_id}"
-      event = FIDIUS::EvasionDB.get_event(event_id)
-      packet = FIDIUS::EvasionDB.get_packet_for_event(event_id)
+      event = FIDIUS::EvasionDB::Knowledge.get_event(event_id)
+      packet = FIDIUS::EvasionDB::Knowledge.get_packet_for_event(event_id)
       print_line "(#{event.id}) Event(#{event.text}) : #{event.payload_size} bytes payload"
       unless packet
         print_line "no packets available"
@@ -190,13 +190,13 @@ class Plugin::EvasionTester < Msf::Plugin
     end
 
 
-    def cmd_start_attack(*args)
-      print_status("start attack")
-      FIDIUS::EvasionDB.start_attack
-    end
+    #def cmd_start_attack(*args)
+    #  print_status("start attack")
+    #  FIDIUS::EvasionDB.current_recorder.start_recording
+    #end
 
     def cmd_fetch_events(*args)
-      events = FIDIUS::EvasionDB.fetch_events
+      events = FIDIUS::EvasionDB::Knowledge.fetch_events
       if events
         print_status "#{events.size} events generated"
         print_status
@@ -215,12 +215,16 @@ class Plugin::EvasionTester < Msf::Plugin
     msf_home = File.expand_path("../..",__FILE__)
     dbconfig_path = File.join(msf_home,"data","database.yml")
     raise "no database.yml in #{dbconfig_path}" if !File.exists?(dbconfig_path)
-    FIDIUS::EvasionDB.db_connect(dbconfig_path)
+    FIDIUS::EvasionDB.config(dbconfig_path)
+    FIDIUS::EvasionDB.use_recoder "Msf-Recorder"
+    FIDIUS::EvasionDB.use_fetcher "PreludeDB"
+
     add_console_dispatcher(ConsoleCommandDispatcher)
     framework.events.add_general_subscriber(FIDIUS::ModuleRunCallback.new)
+
     FIDIUS::PacketLogger.init_with_framework(framework)
     FIDIUS::PacketLogger.on_log do |caused_by, data, socket|
-      FIDIUS::EvasionDB.log_packet(caused_by,data,socket)
+      FIDIUS::EvasionDB.current_recorder.log_packet(caused_by,data,socket)
     end
     print_status("EvasionTester plugin loaded.")
   end
@@ -288,20 +292,20 @@ end #PacketLogger
 
 class ModuleRunCallback
   def on_module_run(instance)
-    FIDIUS::EvasionDB.module_started(instance)
+    FIDIUS::EvasionDB.current_recorder.module_started(instance)
   end
 	#
 	# Called when a module finishes
 	#
 	def on_module_complete(instance)
-    FIDIUS::EvasionDB.module_completed(instance)
+    FIDIUS::EvasionDB.current_recorder.module_completed(instance)
 	end
 
 	#
 	# Called when a module raises an exception
 	#
 	def on_module_error(instance, exception)
-    FIDIUS::EvasionDB.module_error(instance,exception)
+    FIDIUS::EvasionDB.current_recorder.module_error(instance,exception)
 	end
 end #class ModuleRunCallback
 

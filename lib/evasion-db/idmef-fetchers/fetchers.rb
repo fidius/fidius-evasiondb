@@ -13,6 +13,9 @@ module FIDIUS
 
     class Fetcher
       @@fetchers = []
+      attr_accessor :name
+      attr_accessor :local_ip
+
       def initialize(name,&block)
         self.instance_eval(&block)
         @name = name
@@ -38,12 +41,19 @@ module FIDIUS
         raise "overwrite this"
       end
 
-      def get_events
+      def fetch_events
         raise "overwrite this"
       end
 
       def self.all
         @@fetchers
+      end
+
+      def self.by_name(name)
+        self.all.each do |fetcher|
+          return fetcher if fetcher.name == name
+        end
+        nil
       end
     end
   end

@@ -34,7 +34,20 @@ module FIDIUS
         @@recorders
       end
 
+      def self.by_name(name)
+        self.all.each do |recorder|
+          return recorder if recorder.name == name
+        end
+        nil
+      end
 
+      def start
+        raise "overwrite this"
+      end
+
+      def log_packet
+        raise "overwrite this"
+      end
     end
   end
 end

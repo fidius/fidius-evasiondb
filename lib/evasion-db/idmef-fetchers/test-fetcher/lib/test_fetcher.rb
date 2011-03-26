@@ -9,7 +9,7 @@ module FIDIUS
         $logger.error "test-fetcher begin record"
       end
 
-      def get_events
+      def fetch_events
         $logger.error "test-fetcher get events"
       end
     end

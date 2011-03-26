@@ -11,12 +11,53 @@ module FIDIUS
       end
 
       def begin_record
-        $logger.error "deine mudder begin record"
+        a = Alert.find(:first,:joins => [:detect_time],:order=>"time DESC")
+        last_event = PreludeEvent.new(a)
+        @start_time = last_event.detect_time
       end
 
       def get_events
-        $logger.error "deine mudder get events"
+        raise "no local ip given" if @local_ip == nil
+        #raise "no connection to database" if !@connection_established
+        raise "please begin_record before fetching" if @start_time == nil
+        res = Array.new
+        $logger.debug "alert.find(:all,:joins=>[:detect_time],time > #{@start_time})"
+        events = Alert.find(:all,:joins => [:detect_time],:order=>"time DESC",:conditions=>["time > :d",{:d => @start_time}])
+        $logger.debug "found #{events.size} events"
+        events.each do |event|
+          ev = PreludeEvent.new(event)
+          $logger.debug "Event #{ev.source_ip} -> #{ev.dest_ip}  local_ip:#{@local_ip}"
+          if ev.source_ip == @local_ip || ev.dest_ip == @local_ip
+            $logger.debug "adding #{ev.inspect} to events "
+            res << ev
+          end
+        end
+        return res
       end
+
+
+
+
+
+      def fetch_events(module_instance=nil)
+        #events = get_events
+        # TODO: what shall we do with meterpreter? 
+        # it has not options and no fullname, logger assigns only the string "meterpreter"
+        #if !$current_exploit.finished
+          get_events.each do |event|
+            idmef_event = IdmefEvent.create(:payload=>event.payload,:detect_time=>event.detect_time,
+                              :dest_ip=>event.dest_ip,:src_ip=>event.source_ip,
+                              :dest_port=>event.dest_port,:src_port=>event.source_port,
+                              :text=>event.text,:severity=>event.severity,
+                              :analyzer_model=>event.analyzer_model,:ident=>event.id)
+          end
+        #end
+        #if module_instance && module_instance.respond_to?("fullname")
+        #  $current_exploit.save if !exploit.finished
+        #end
+        return events
+      end
+
     end
   end
 end
