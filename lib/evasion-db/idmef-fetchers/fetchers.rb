@@ -5,6 +5,7 @@ module FIDIUS
     end
 
     def self.install_fetchers
+      $logger.debug "installing fetchers"
       FIDIUS::EvasionDB::Fetcher.all.each do |fetcher|
         fetcher.run_install
       end
@@ -14,6 +15,7 @@ module FIDIUS
       @@fetchers = []
       def initialize(name,&block)
         self.instance_eval(&block)
+        @name = name
         @@fetchers << self
       end
 
@@ -24,6 +26,7 @@ module FIDIUS
 
       def run_install
         raise "no install block given" unless @install
+        $logger.debug "run install of #{@name}"
         @install.call
       end
 
