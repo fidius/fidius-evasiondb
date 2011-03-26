@@ -1,5 +1,21 @@
 module FIDIUS
   module EvasionDB
+    def self.config(yml_file)
+      raise "#{file} does not exist" unless File.exists? File.expand_path(file)
+      yml_config = YAML.load(File.read(yml_file))
+      evasion_db = yml_config['evasion_db']
+      unless evasion_db
+        raise "no evasion_db part found in file"
+      else
+        FIDIUS::EvasionDB::Knowledge::Connection.establish_connection evasion_db
+        FIDIUS::EvasionDB::Knowledge::Connection.connection
+
+        FIDIUS::EvasionDB::Fetcher.all.each do |fetcher|
+          fetcher.config(yml_config)
+        end
+      end
+    end
+
     def self.get_exploits
       Exploit.all
     end

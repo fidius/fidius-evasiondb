@@ -1,3 +1,7 @@
-class Connection < ActiveRecord::Base
+module FIDIUS
+  module PreludeDB
+    class Connection < ActiveRecord::Base
 
+    end
+  end
 end

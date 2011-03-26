@@ -28,6 +28,11 @@ module FIDIUS
         raise "no install block given" unless @install
         $logger.debug "run install of #{@name}"
         @install.call
+        self.init
+      end
+
+      def config(conf)
+        raise "overwrite this"
       end
 
       def begin_record
