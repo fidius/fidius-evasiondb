@@ -11,20 +11,22 @@ module FIDIUS
     require (File.join GEM_BASE, 'evasion-db','log_matches_helper.rb')
     require (File.join GEM_BASE, 'evasion-db','commands.rb')
     require (File.join GEM_BASE, 'evasion-db','finders.rb')
-    require (File.join GEM_BASE, 'evasion-db','event_fetcher.rb')
+    #require (File.join GEM_BASE, 'evasion-db','event_fetcher.rb')
 
-    Dir.glob(File.join GEM_BASE, 'evasion-db', '*.rb') do |rb|
+    # load knowledge
+    require (File.join GEM_BASE, 'evasion-db','knowledge', 'connection.rb')
+    Dir.glob(File.join GEM_BASE, 'evasion-db','knowledge', '*.rb') do |rb|
       require rb
     end
 
-    require (File.join GEM_BASE, 'idmef-fetchers','fetchers.rb')
+    require (File.join GEM_BASE, 'evasion-db','idmef-fetchers','fetchers.rb')
     FIDIUS::EvasionDB.install_fetchers
 
-    require (File.join GEM_BASE, 'models', 'evasion','evasion_db_connection.rb')
-    Dir.glob(File.join GEM_BASE, 'models', 'evasion', '*.rb') do |rb|
-      require rb
-    end
+    #require (File.join GEM_BASE, 'models', 'evasion','evasion_db_connection.rb')
+    #Dir.glob(File.join GEM_BASE, 'models', 'evasion', '*.rb') do |rb|
+    #  require rb
+    #end
 
-    $prelude_event_fetcher = PreludeEventFetcher.new
+    #$prelude_event_fetcher = PreludeEventFetcher.new
   end
 end
