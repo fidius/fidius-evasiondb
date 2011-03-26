@@ -1,5 +1,5 @@
-module FIDIUS::EvasionDB::Models
-  class Packet < FIDIUS::EvasionDB::Models::Connection
+module FIDIUS::EvasionDB::Knowledge
+  class Packet < FIDIUS::EvasionDB::Knowledge::Connection
     belongs_to :exploit
     belongs_to :exploit_payload
 

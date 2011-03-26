@@ -1,4 +1,4 @@
-module FIDIUS::EvasionDB::Models
+module FIDIUS::EvasionDB::Knowledge
   class Connection < ActiveRecord::Base
 
   end
