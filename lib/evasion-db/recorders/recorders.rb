@@ -12,11 +12,11 @@ module FIDIUS
     end
 
     class Recorder
-      @@fetchers = []
+      @@recorders = []
       def initialize(name,&block)
         self.instance_eval(&block)
         @name = name
-        @@fetchers << self
+        @@recorders << self
       end
 
       def install(&block)
@@ -31,8 +31,10 @@ module FIDIUS
       end
 
       def self.all
-        @@fetchers
+        @@recorders
       end
+
+
     end
   end
 end

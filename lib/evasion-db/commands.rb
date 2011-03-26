@@ -16,53 +16,15 @@ module FIDIUS
       end
     end
 
-    def self.get_exploits
-      Exploit.all
+    def self.use_recoder(fetcher)
+
     end
 
-    def self.get_packet(id)
-      Packet.find(id)
+    def self.use_fetcher(recorder)
+
     end
 
-    def self.get_events
-      IdmefEvent.all
-    end
 
-    def self.get_event(event_id)
-      IdmefEvent.find(event_id)
-    end
-
-    def self.get_packet(pid)
-      Packet.find(pid)
-    end
-
-    def self.get_packet_for_event(event_id)
-      event = IdmefEvent.find(event_id)
-      FIDIUS::EvasionDB::LogMatchesHelper.find_packets_for_event(event,Packet.all)
-    end
-
-    def self.module_started(module_instance)
-      $current_exploit = Exploit.find_or_create_by_name_and_options(module_instance.fullname,module_instance.datastore)
-      self.start_attack
-    end
-
-    def self.module_completed(module_instance)
-      # TODO: refactor this
-      if module_instance.datastore["RHOST"]
-        $prelude_event_fetcher.local_ip = FIDIUS::Common.get_my_ip(module_instance.datastore["RHOST"]) unless $prelude_event_fetcher.local_ip
-      end
-      if module_instance.datastore["RHOSTS"]
-        $prelude_event_fetcher.local_ip = FIDIUS::Common.get_my_ip(module_instance.datastore["RHOSTS"]) unless $prelude_event_fetcher.local_ip
-      end
-      self.fetch_events(module_instance)
-
-      $current_exploit.finished = true
-      $current_exploit.save
-    end
-
-    def self.module_error(module_instance,exception)
-      self.module_completed(module_instance)
-    end
 
     def self.set_local_ip(ip)
       $prelude_event_fetcher.local_ip = ip

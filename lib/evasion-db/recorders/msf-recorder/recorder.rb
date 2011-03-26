@@ -1,4 +1,4 @@
-FIDIUS::EvasionDB.fetcher "TestFetcher" do
+FIDIUS::EvasionDB.recorder "Msf-Recorder" do
   install do
     require (File.join File.dirname(__FILE__), 'lib', 'msf-recorder.rb')
     self.extend MsfRecorder

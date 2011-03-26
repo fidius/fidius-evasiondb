@@ -23,7 +23,7 @@ module FIDIUS
     FIDIUS::EvasionDB.install_fetchers
 
     # install fetchers
-    require (File.join GEM_BASE, 'evasion-db','recoders','recoders.rb')
+    require (File.join GEM_BASE, 'evasion-db','recorders','recorders.rb')
     FIDIUS::EvasionDB.install_recorders
 
     #require (File.join GEM_BASE, 'models', 'evasion','evasion_db_connection.rb')
