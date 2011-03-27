@@ -18,6 +18,7 @@ module FIDIUS
 
       def initialize(name,&block)
         self.instance_eval(&block)
+        @local_ip = nil
         @name = name
         @@fetchers << self
       end

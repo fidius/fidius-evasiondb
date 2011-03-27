@@ -11,8 +11,8 @@ module FIDIUS
       end
 
       def begin_record
-        a = Alert.find(:first,:joins => [:detect_time],:order=>"time DESC")
-        last_event = PreludeEvent.new(a)
+        a = FIDIUS::PreludeDB::Alert.find(:first,:joins => [:detect_time],:order=>"time DESC")
+        last_event = FIDIUS::PreludeDB::PreludeEvent.new(a)
         @start_time = last_event.detect_time
       end
 
@@ -22,10 +22,10 @@ module FIDIUS
         raise "please begin_record before fetching" if @start_time == nil
         res = Array.new
         $logger.debug "alert.find(:all,:joins=>[:detect_time],time > #{@start_time})"
-        events = Alert.find(:all,:joins => [:detect_time],:order=>"time DESC",:conditions=>["time > :d",{:d => @start_time}])
+        events = FIDIUS::PreludeDB::Alert.find(:all,:joins => [:detect_time],:order=>"time DESC",:conditions=>["time > :d",{:d => @start_time}])
         $logger.debug "found #{events.size} events"
         events.each do |event|
-          ev = PreludeEvent.new(event)
+          ev = FIDIUS::PreludeDB::PreludeEvent.new(event)
           $logger.debug "Event #{ev.source_ip} -> #{ev.dest_ip}  local_ip:#{@local_ip}"
           if ev.source_ip == @local_ip || ev.dest_ip == @local_ip
             $logger.debug "adding #{ev.inspect} to events "
@@ -35,22 +35,18 @@ module FIDIUS
         return res
       end
 
-
-
-
-
       def fetch_events(module_instance=nil)
-        #events = get_events
+        events = get_events
         # TODO: what shall we do with meterpreter? 
         # it has not options and no fullname, logger assigns only the string "meterpreter"
         #if !$current_exploit.finished
-          get_events.each do |event|
-            idmef_event = IdmefEvent.create(:payload=>event.payload,:detect_time=>event.detect_time,
-                              :dest_ip=>event.dest_ip,:src_ip=>event.source_ip,
-                              :dest_port=>event.dest_port,:src_port=>event.source_port,
-                              :text=>event.text,:severity=>event.severity,
-                              :analyzer_model=>event.analyzer_model,:ident=>event.id)
-          end
+        events.each do |event|
+          idmef_event = FIDIUS::EvasionDB::Knowledge::IdmefEvent.create(:payload=>event.payload,:detect_time=>event.detect_time,
+                            :dest_ip=>event.dest_ip,:src_ip=>event.source_ip,
+                            :dest_port=>event.dest_port,:src_port=>event.source_port,
+                            :text=>event.text,:severity=>event.severity,
+                            :analyzer_model=>event.analyzer_model,:ident=>event.id)
+        end
         #end
         #if module_instance && module_instance.respond_to?("fullname")
         #  $current_exploit.save if !exploit.finished

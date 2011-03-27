@@ -13,6 +13,8 @@ module FIDIUS
 
     class Recorder
       @@recorders = []
+      attr_accessor :name
+
       def initialize(name,&block)
         self.instance_eval(&block)
         @name = name

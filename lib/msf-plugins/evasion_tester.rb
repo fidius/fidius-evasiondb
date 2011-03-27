@@ -211,6 +211,7 @@ class Plugin::EvasionTester < Msf::Plugin
 
   def initialize(framework, opts)
     super
+    begin
     require 'fidius-evasiondb'
     msf_home = File.expand_path("../..",__FILE__)
     dbconfig_path = File.join(msf_home,"data","database.yml")
@@ -227,6 +228,9 @@ class Plugin::EvasionTester < Msf::Plugin
       FIDIUS::EvasionDB.current_recorder.log_packet(caused_by,data,socket)
     end
     print_status("EvasionTester plugin loaded.")
+    rescue
+      print_error $!.message+":"+$!.backtrace
+    end
   end
 
   def cleanup
