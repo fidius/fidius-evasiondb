@@ -36,6 +36,7 @@ module FIDIUS
       end
 
       def fetch_events(module_instance=nil)
+        result = []
         events = get_events
         # TODO: what shall we do with meterpreter? 
         # it has not options and no fullname, logger assigns only the string "meterpreter"
@@ -46,12 +47,13 @@ module FIDIUS
                             :dest_port=>event.dest_port,:src_port=>event.source_port,
                             :text=>event.text,:severity=>event.severity,
                             :analyzer_model=>event.analyzer_model,:ident=>event.id)
+          result << idmef_event
         end
         #end
         #if module_instance && module_instance.respond_to?("fullname")
         #  $current_exploit.save if !exploit.finished
         #end
-        return events
+        return result
       end
 
     end
