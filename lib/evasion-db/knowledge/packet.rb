@@ -1,4 +1,5 @@
 module FIDIUS::EvasionDB::Knowledge
+  # every attack module sends multiple packets which are stored within this model
   class Packet < FIDIUS::EvasionDB::Knowledge::Connection
     belongs_to :attack_module
     belongs_to :attack_payload

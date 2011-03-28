@@ -1,34 +1,61 @@
 module FIDIUS
   module EvasionDB
+    # This module provides active-record classes for the knowledge database.
+    # Some handy query methods are also available.
     module Knowledge
+      # used in find_events_for_exploit
+      # to indicate that the exploit with minimal events should be searched
+      MIN_EVENTS = 1
+      # used in find_events_for_exploit
+      # to indicate that the exploit with maximal events should be searched
+      MAX_EVENTS = 2
+
+      # returns all modules(exploits) in knowledge database
       def self.get_exploits
         AttackModule.all
       end
 
+      # finds a packet within an id
+      #
+      #@param [integer] packet id
       def self.get_packet(id)
         Packet.find(id)
       end
 
+      # returns all idmef-events
       def self.get_events
         IdmefEvent.all
       end
 
+      # return an certain event
+      #
+      #@param [integer] event id
       def self.get_event(event_id)
         IdmefEvent.find(event_id)
       end
 
+      # returns a cretain packet
+      #
+      #@param [integer] packet id
       def self.get_packet(pid)
         Packet.find(pid)
       end
 
+      # returns the packets which might be responsible for the given event
+      #
+      # @param [integer] event id
       def self.get_packet_for_event(event_id)
         event = IdmefEvent.find(event_id)
         FIDIUS::EvasionDB::LogMatchesHelper.find_packets_for_event(event,Packet.all)
       end
-
-      MIN_EVENTS = 1
-      MAX_EVENTS = 2
       
+      # find events for an module(exploit). you can restrict your results by setting options
+      # which sould be used by the exploit. You can even determine if minimal or maximal size of 
+      # events should be returned
+      #
+      #@param [string] exploit/module name 
+      #@param [hash] options which sould be used
+      #@param [integer] MIN_EVENTS||MAX_EVENTS
       def self.find_events_for_exploit(name,options={},result = MIN_EVENTS)
         attacks = AttackModule.find_all_by_name(name).delete_if do |attack|
           !attack.has_options(options)

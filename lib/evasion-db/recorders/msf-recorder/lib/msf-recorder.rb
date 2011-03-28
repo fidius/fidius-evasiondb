@@ -1,5 +1,9 @@
 module FIDIUS
   module EvasionDB
+    # This recorder provides an interface for the metasploit console
+    # it is used to have callbacks when modules are executed. 
+    # 
+    # @see {file:msf-plugins/evasiondb.rb}
     module MsfRecorder
       def module_started(module_instance)
         @@current_exploit = FIDIUS::EvasionDB::Knowledge::AttackModule.find_or_create_by_name_and_options(module_instance.fullname,module_instance.datastore)

@@ -1,4 +1,5 @@
 module FIDIUS::EvasionDB::Knowledge
+  # model for local store generated idmef events and relate them to an executed attack
   class IdmefEvent < FIDIUS::EvasionDB::Knowledge::Connection
     belongs_to :attack_module
     belongs_to :attack_payload

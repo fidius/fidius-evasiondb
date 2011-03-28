@@ -11,6 +11,7 @@ module FIDIUS
       end
     end
 
+    # A Fetcher is used to fetch events from an ids
     class Fetcher
       @@fetchers = []
       attr_accessor :name

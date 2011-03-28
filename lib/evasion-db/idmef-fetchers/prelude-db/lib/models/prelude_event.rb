@@ -1,5 +1,6 @@
 module FIDIUS
   module PreludeDB
+    # Represents an IDMEF-Event which is distributed over multiple tables in PreludeManager
     class PreludeEvent < FIDIUS::PreludeDB::Connection
       has_many :annotated_events
       def self.columns() @columns ||= []; end

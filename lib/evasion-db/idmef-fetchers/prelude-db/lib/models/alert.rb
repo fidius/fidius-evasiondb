@@ -1,6 +1,7 @@
 module FIDIUS
   module PreludeDB
 
+    # Wrapper for Prelude_Alert table
     class Alert < FIDIUS::PreludeDB::Connection
       has_one :detect_time, :class_name => 'DetectTime', :foreign_key => :_message_ident, :primary_key => :_ident
       has_one :source_address, :class_name => 'Address', :foreign_key => :_message_ident, :primary_key => :_ident, :conditions => [ "Prelude_Address._parent_type = 'S'" ]

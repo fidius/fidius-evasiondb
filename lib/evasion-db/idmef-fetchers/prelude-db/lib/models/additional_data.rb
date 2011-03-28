@@ -1,5 +1,6 @@
 module FIDIUS
   module PreludeDB
+    # Wrapper for Prelude_AddionalData table
     class AdditionalData < FIDIUS::PreludeDB::Connection
       set_table_name "Prelude_AdditionalData"
       def self.columns() @columns ||= []; end

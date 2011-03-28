@@ -1,5 +1,6 @@
 module FIDIUS
   module EvasionDB
+    # This module is only a sample how a custom fetcher could be implemented.
     module TestFetcher
       def config(conf)
         $logger.debug "INIT Test FETCHER"

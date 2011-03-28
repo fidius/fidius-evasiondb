@@ -1,5 +1,7 @@
 require 'digest/md5'
 module FIDIUS::EvasionDB::Knowledge
+  # Represents an Attack
+  # in metasploit this would be exploits or auxiliaries
   class AttackModule < FIDIUS::EvasionDB::Knowledge::Connection
     has_many :idmef_events, :dependent=>:destroy
     has_many :packets, :dependent=>:destroy

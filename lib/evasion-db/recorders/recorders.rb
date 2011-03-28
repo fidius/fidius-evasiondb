@@ -11,6 +11,7 @@ module FIDIUS
       end
     end
 
+    # A Recorder us used to log packets for an executed attack
     class Recorder
       @@recorders = []
       attr_accessor :name

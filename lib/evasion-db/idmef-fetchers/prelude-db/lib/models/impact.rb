@@ -1,5 +1,6 @@
 module FIDIUS
   module PreludeDB
+    # Wrapper for Prelude_Impact table
     class Impact < FIDIUS::PreludeDB::Connection
       def self.columns() @columns ||= []; end
       def self.column(name, sql_type=nil, default=nil,null=true)
