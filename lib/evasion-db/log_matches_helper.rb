@@ -14,7 +14,6 @@ module FIDIUS
 	end
 
   def self.find_packets_for_event(event,packets)
-    require 'rex'
     event_payload = nil
     return unless event.payload
     if event.payload.size > 0
@@ -29,7 +28,6 @@ module FIDIUS
       packet_payload = self.to_hex(packet.payload).gsub("\\x","")
       str = packet_payload[event_payload]
       return {:packet=>packet,:index=>packet.payload.index(event.payload),:length=>event.payload.size} if str != nil
-      #return str if str != nil
     end
     nil
   end

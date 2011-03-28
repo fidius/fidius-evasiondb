@@ -6,11 +6,12 @@ module FIDIUS
       end
 
       def begin_record
-        $logger.error "test-fetcher begin record"
+        $logger.debug "test-fetcher begin record"
       end
 
-      def fetch_events
-        $logger.error "test-fetcher get events"
+      def fetch_events(*args)
+        $logger.debug "test-fetcher get events"
+        return []
       end
     end
   end

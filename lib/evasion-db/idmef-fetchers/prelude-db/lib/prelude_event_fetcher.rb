@@ -6,7 +6,8 @@ module FIDIUS
  	      ids_db = conf['ids_db']
         raise "no ids_db part found" unless ids_db
         FIDIUS::PreludeDB::Connection.establish_connection ids_db
-        FIDIUS::PreludeDB::Connection.connection
+        connection = FIDIUS::PreludeDB::Connection.connection
+        $logger.debug "connection is: #{connection}"
         require (File.join File.dirname(__FILE__), 'patches', 'postgres_patch.rb')
       end
 
@@ -18,7 +19,6 @@ module FIDIUS
 
       def get_events
         raise "no local ip given" if @local_ip == nil
-        #raise "no connection to database" if !@connection_established
         raise "please begin_record before fetching" if @start_time == nil
         res = Array.new
         $logger.debug "alert.find(:all,:joins=>[:detect_time],time > #{@start_time})"
@@ -38,9 +38,6 @@ module FIDIUS
       def fetch_events(module_instance=nil)
         result = []
         events = get_events
-        # TODO: what shall we do with meterpreter? 
-        # it has not options and no fullname, logger assigns only the string "meterpreter"
-        #if !$current_exploit.finished
         events.each do |event|
           idmef_event = FIDIUS::EvasionDB::Knowledge::IdmefEvent.create(:payload=>event.payload,:detect_time=>event.detect_time,
                             :dest_ip=>event.dest_ip,:src_ip=>event.source_ip,
@@ -49,10 +46,6 @@ module FIDIUS
                             :analyzer_model=>event.analyzer_model,:ident=>event.id)
           result << idmef_event
         end
-        #end
-        #if module_instance && module_instance.respond_to?("fullname")
-        #  $current_exploit.save if !exploit.finished
-        #end
         return result
       end
 
@@ -60,8 +53,8 @@ module FIDIUS
   end
 end
 
-require (File.join File.dirname(__FILE__), 'models', 'prelude_event.rb')
 require (File.join File.dirname(__FILE__), 'models', 'connection.rb')
+
 Dir.glob(File.join File.dirname(__FILE__), 'models', '*.rb') do |rb|
   $logger.debug "loading #{rb}"
   require rb

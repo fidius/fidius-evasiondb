@@ -1,6 +1,6 @@
 module FIDIUS
   module PreludeDB
-    class PreludeEvent < ActiveRecord::Base
+    class PreludeEvent < FIDIUS::PreludeDB::Connection
       has_many :annotated_events
       def self.columns() @columns ||= []; end
       def self.column(name, sql_type=nil, default=nil,null=true)
@@ -28,11 +28,12 @@ module FIDIUS
         else
           case args[0]  
             when :all
-              if(args[1][:conditions] == nil)
-                args[1] = args[1].merge({:joins => [:detect_time,]})
-                args[1] = args[1].merge({:order => 'time DESC'})
+              if args[1]
+                if(args[1][:conditions] == nil)
+                  args[1] = args[1].merge({:joins => [:detect_time,]})
+                  args[1] = args[1].merge({:order => 'time DESC'})
+                end
               end
-
               a = Alert.find(*args)
               result = Array.new
               a.each do |pa|
@@ -97,118 +98,11 @@ module FIDIUS
         return "No Ref"
       end
 
-      def self.find_for_autoanno(source,dest,from=nil,to=nil)
-        find_and_paginate_with_custom_options(1,nil,1000,source,dest,from,to)
-      end
-
-      def self.find_and_paginate_with_custom_options(page,severity = nil,perpage=nil,filter_source=nil,filter_dest=nil,from=nil,to=nil)
-        
-        perpage = 15 if perpage == nil || perpage.to_i < 1
-        # TODO FIXME
-        perpage = perpage * 4 
-        
-        severity = 'low' if severity==0
-        severity = 'medium' if severity==1
-        severity = 'high' if severity==2
-
-        cond = Array.new
-        cond.push "severity = '"+severity+"'" if severity != nil
-
-        if !filter_dest.nil? || !filter_source.nil?
-          filter_dest = filter_dest.to_s
-          filter_source = filter_source.to_s
-          # TODO: make this more secure
-          cond.push "(((#{PRELUDE_DB}.Prelude_Address.address LIKE '%"+filter_source+"%' AND #{PRELUDE_DB}.Prelude_Address._parent_type = 'S')) 
-            OR ((#{PRELUDE_DB}.Prelude_Address.address LIKE '%"+filter_dest+"%' AND #{PRELUDE_DB}.Prelude_Address._parent_type = 'T')))"
-        end
-
-        if !from.nil?
-          from_time = Time.at(from-Time.new.utc_offset)
-
-          y = from_time.year.to_s
-          m = from_time.month.to_s
-          d = from_time.day.to_s
-          h = from_time.hour.to_s
-          min = from_time.min.to_s
-          sec = from_time.sec.to_s
-          m = "0"+m if m.to_i/10 == 0
-          d = "0"+d if d.to_i/10 == 0
-          h = "0"+h if h.to_i/10 == 0
-          min = "0"+min if min.to_i/10 == 0
-          sec = "0"+sec if sec.to_i/10 == 0
-
-          from_time = y+m+d+h+min+sec
-          cond.push "(Prelude_DetectTime.TIME >= "+from_time.to_s+")" 
-        end
-
-        if !to.nil?
-          to_time = Time.at(to-Time.new.utc_offset)
-
-          y = to_time.year.to_s
-          m = to_time.month.to_s
-          d = to_time.day.to_s
-          h = to_time.hour.to_s
-          min = to_time.min.to_s
-          sec = to_time.sec.to_s
-          m = "0"+m if m.to_i/10 == 0
-          d = "0"+d if d.to_i/10 == 0
-          h = "0"+h if h.to_i/10 == 0
-          min = "0"+min if min.to_i/10 == 0
-          sec = "0"+sec if sec.to_i/10 == 0
-
-          to_time = y+m+d+h+min+sec
-          cond.push "(Prelude_DetectTime.TIME <= "+to_time.to_s+")" 
-        end
-        cluster_idmef_ids = Array.new
-        Cluster.all.each do |c|
-          cluster_idmef_ids.push c.idmef_id
-        end
-        cond.push "(messageid='"+cluster_idmef_ids.join("' OR messageid='")+"')"
-
-
-        cond = cond.join(" AND ")
-        # FIXME: nich mehr schön, 2 mal alles abfragen...
-        # total entries muss sinnvolle conditions nehmen und
-        # eigl nur direkt nen count query schicken... performanter ...
-        total_entries = PreludeEvent.find(:all,:joins => [:detect_time,:impact,:source_address],
-          :order => 'time DESC',
-          :conditions => cond).size
-        # ---------------------------
-
-
-        pe = PreludeEvent.paginate(
-          :page => page , 
-          :per_page => perpage, 
-          :total_entries => total_entries, #PreludeEvent.total_entries,
-
-          :joins => [:detect_time,:impact,:source_address],
-          :order => 'time DESC',
-          :conditions => cond
-        )
-        pe2 = pe.uniq
-        pe2.each do |ppp|
-          puts ppp.messageid.to_s
-          if !cluster_idmef_ids.member?(ppp.messageid)
-            pe.delete ppp
-          end
-        end
-        pe = pe.uniq
-        return pe
-      end
-
-      def cluster_nr
-        c = Cluster.find_by_idmef_id(messageid)
-        if c != nil
-          return c.cluster_nr
-        end
-        return -1
-      end
-
       def inspect
         begin
         return "PreludeEvent id: "+id.to_s+", source_ip: "+source_ip+" dest_ip: "+dest_ip+" severity: "+severity+" text: "+text+" analyzer_model: "+analyzer_model+" detect_time: "+detect_time.to_s+""
         rescue
-
+          puts $!.message+":"+$!.backtrace.to_s
         end
       end
 
@@ -217,7 +111,8 @@ module FIDIUS
       end
 
       def messageid
-        return @prelude_alert.messageid
+        return @prelude_alert.messageid unless @prelude_alert.nil?
+        return "No Ref"
       end
     end
   end

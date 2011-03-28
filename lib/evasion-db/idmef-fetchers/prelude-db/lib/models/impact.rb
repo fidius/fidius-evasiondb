@@ -8,6 +8,7 @@ module FIDIUS
 
       column :description, :string
       column :severity, :string
+      column :_message_ident, :bigint
 
       def self.table_name
         "Prelude_Impact"

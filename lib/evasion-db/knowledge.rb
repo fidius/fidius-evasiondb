@@ -36,9 +36,6 @@ module FIDIUS
         end
         nil
       end
-      #sig: exploit(string), options, [MAX,MIN,ARRAY]
-
-
     end
   end
 end 

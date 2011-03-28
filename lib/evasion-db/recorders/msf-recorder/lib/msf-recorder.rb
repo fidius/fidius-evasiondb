@@ -42,8 +42,6 @@ module FIDIUS
         module_completed(module_instance)
       end
 
-
-
       def log_packet(module_instance,data,socket)
         begin
           # set local ip, if there is no

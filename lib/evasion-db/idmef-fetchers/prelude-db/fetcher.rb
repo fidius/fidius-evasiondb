@@ -3,7 +3,6 @@ FIDIUS::EvasionDB.fetcher "PreludeDB" do
   $logger.debug "prelude-db do"
   install do
     require (File.join File.dirname(__FILE__), 'lib', 'prelude_event_fetcher.rb')
-    puts "self.extends#{PreludeEventFetcher}"
     self.extend PreludeEventFetcher
   end
 end

@@ -7,6 +7,8 @@ module FIDIUS
       end
       column :model, :string
       column :name, :string
+      column :_message_ident, :bigint
+
       def self.table_name
         "Prelude_Analyzer"
       end
