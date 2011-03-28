@@ -1,6 +1,10 @@
+#require 'rubygems'
+require "rubygems"
+require "bundler"
+Bundler.setup
 require 'logger'
-require 'active_record'
-require 'fidius-common'
+#require 'active_record'
+#require 'fidius-common'
 
 module FIDIUS
   module EvasionDB
