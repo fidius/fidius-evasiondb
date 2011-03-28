@@ -4,7 +4,7 @@ class Plugin::EvasionTester < Msf::Plugin
   class ConsoleCommandDispatcher
     include Msf::Ui::Console::CommandDispatcher
     def name
-      "EvasionTester"
+      "FIDIUS-EvasionDB"
     end
 
     def explain_db_connection
@@ -180,17 +180,11 @@ class Plugin::EvasionTester < Msf::Plugin
 
   def initialize(framework, opts)
     super
-    print_line "init evastiontester"
-    begin
-    print_line "require gem"
     require 'fidius-evasiondb'
-    print_line "gem required"
     msf_home = File.expand_path("../..",__FILE__)
-    print_line "msf_home: #{msf_home}"
     dbconfig_path = File.join(msf_home,"data","database.yml")
-    print_line "dbconfig_path: #{dbconfig_path}"
     raise "no database.yml in #{dbconfig_path}" if !File.exists?(dbconfig_path)
-    print_line "config gem"
+
     FIDIUS::EvasionDB.config(dbconfig_path)
     FIDIUS::EvasionDB.use_recoder "Msf-Recorder"
     FIDIUS::EvasionDB.use_fetcher "PreludeDB"
@@ -203,9 +197,6 @@ class Plugin::EvasionTester < Msf::Plugin
       FIDIUS::EvasionDB.current_recorder.log_packet(caused_by,data,socket)
     end
     print_status("EvasionTester plugin loaded.")
-    rescue
-      print_error $!.message+":"+$!.backtrace.to_s
-    end
   end
 
   def cleanup

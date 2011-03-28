@@ -26,7 +26,7 @@ optparse = OptionParser.new do |opts|
     puts messages['empty']
     if in_msf_root?
       puts "Copy files for MSF-Plugin..."
-      plugin_source = File.join(GEM_BASE, 'msf-plugins', 'evasion_tester.rb')
+      plugin_source = File.join(GEM_BASE, 'msf-plugins', 'evasiondb.rb')
       FileUtils.cp(plugin_source, 'plugins')
       puts "Copied plugin to 'plugins/evasion_tester.rb'"
 

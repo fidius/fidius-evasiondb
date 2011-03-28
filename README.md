@@ -20,7 +20,7 @@ Then switch to the root directory of your Metasploit installation and run
 
     $ fidius-evasiondb -e
 
-Follow the instructions.
+Follow the instructions. This Gem uses currently 2 databases.  
 
 Please note: The Evasion-DB Gem has only been tested with Linux systems
 and might
@@ -43,6 +43,7 @@ There are two possibilities to use this Gem, either inside the Metasploit consol
 * example for monitoring an exploit
 * 
 
+  $ 
 ### From external script
 
 * require gem, connect_db
@@ -61,7 +62,6 @@ fidius-evasiondb was written by
 * in particular:
  * Bernhard Katzmarski <bkatzm+fidius-evasiondb@tzi.de>
  * Jens Färber <jfaerber+fidius-evasiondb@tzi.de>
- * Kai-Uwe Hanke <khanke+fidius-evasiondb@tzi.de>
 
 If you have any questions, remarks, suggestion, improvements,
 etc. feel free to drop a line at the addresses given above.
