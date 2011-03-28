@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# encoding: UTF-8
 module Msf
 class Plugin::EvasionTester < Msf::Plugin
   class ConsoleCommandDispatcher
@@ -26,10 +26,7 @@ class Plugin::EvasionTester < Msf::Plugin
 
     def commands
       {
-      #  "start_attack" => "indicate that you want to collect all events from Time.now on",
         "fetch_events" => "fetch events which were created in the meanwhile",
-       # "evasion_db_connect" => "connect to an instance of prelude database",
-       # "set_local_ip" => "set your local ip to filter events",
         "show_events" => "shows all fetched idmef-events",
         "show_event" => "shows information about an idmef-event",
         "show_packet" => "shows information about a packet",
@@ -37,27 +34,6 @@ class Plugin::EvasionTester < Msf::Plugin
         "send_event_payload" => "send a given payload of an idmef-event to generate false positive"
       }
     end
-
-    #def cmd_set_local_ip(*args)
-    #  raise "example: set_local_ip 10.0.0.100" if args.size != 1
-    #  FIDIUS::EvasionDB.set_local_ip(args[0])
-    #end
-
-    #def cmd_evasion_db_connect(*args)
-    #  if args.size == 0
-    #    # error no path to database.yml
-    #    print_error("no args given")
-    #    explain_db_connection
-    #  else
-    #    file = args[0]
-    #    begin
-    #      FIDIUS::EvasionDB.db_connect(file)
-    #    rescue
-    #      print_error($!)
-    #      explain_db_connection
-    #    end
-    #  end
-    #end
 
 	def to_hex_dump(str, from=-1, to=-1)
     width=16
@@ -81,7 +57,6 @@ class Plugin::EvasionTester < Msf::Plugin
         rescue
           # rescue if the index is out of range, than end mark
           line[line.length-1] = "#{line[line.length-1]}%clr"
-          #print_error("error #{$!.message}")
         end
       end
 			buf << line
@@ -189,12 +164,6 @@ class Plugin::EvasionTester < Msf::Plugin
       print_line hex
     end
 
-
-    #def cmd_start_attack(*args)
-    #  print_status("start attack")
-    #  FIDIUS::EvasionDB.current_recorder.start_recording
-    #end
-
     def cmd_fetch_events(*args)
       events = FIDIUS::EvasionDB::Knowledge.fetch_events
       if events
@@ -211,11 +180,17 @@ class Plugin::EvasionTester < Msf::Plugin
 
   def initialize(framework, opts)
     super
+    print_line "init evastiontester"
     begin
+    print_line "require gem"
     require 'fidius-evasiondb'
+    print_line "gem required"
     msf_home = File.expand_path("../..",__FILE__)
+    print_line "msf_home: #{msf_home}"
     dbconfig_path = File.join(msf_home,"data","database.yml")
+    print_line "dbconfig_path: #{dbconfig_path}"
     raise "no database.yml in #{dbconfig_path}" if !File.exists?(dbconfig_path)
+    print_line "config gem"
     FIDIUS::EvasionDB.config(dbconfig_path)
     FIDIUS::EvasionDB.use_recoder "Msf-Recorder"
     FIDIUS::EvasionDB.use_fetcher "PreludeDB"
@@ -229,7 +204,7 @@ class Plugin::EvasionTester < Msf::Plugin
     end
     print_status("EvasionTester plugin loaded.")
     rescue
-      print_error $!.message+":"+$!.backtrace
+      print_error $!.message+":"+$!.backtrace.to_s
     end
   end
 
@@ -358,21 +333,7 @@ module SocketTracer
   # Hook the write method
   def write(buf, opts = {})
     module_instance = context['MsfExploit'] if context['MsfExploit']
-    #if buf["IPC"] != nil
-    #  $stdout.puts "found IPC packet and replacing"
-    #  buf = Rex::Text.hex_to_raw(Rex::Text.to_hex(buf).gsub("\\x49","\\x49\\x00").gsub("\\x50","\\x50\\x00").gsub("\\x43","\\x43\\x00"))
-    #end
-
-    # ET EXPLOIT x86 JmpCallAdditive Encoder)
-    #jmp_call_exploit = "\\xeb\\x0c\\x5e\\x56\\x31\\x1e\\xad\\x01\\xc3\\x85\\xc0\\x75\\xf7\\xc3\\xe8\\xef\\xff\\xff\\xff"
-    #jmp_evasion = "\\xec\\x0c\\x5e\\x56\\x31\\x1e\\xad\\x01\\xc3\\x85\\xc0\\x75\\xf7\\xc3\\xe8\\xef\\xff\\xff\\xff"
-    #if Rex::Text.to_hex(buf)[jmp_call_exploit]
-    #  $stdout.puts "found jumpcalladditive exploit and replacing"
-    #  buf = Rex::Text.hex_to_raw(Rex::Text.to_hex(buf).gsub(jmp_call_exploit,jmp_evasion))
-    #  #"\\xeb\\x0c\\x5e\\x56\\x31\\x1e\\xad\\x01\\xc3\\x85\\xc0\\x75\\xf7\\xc3\\xe8\\xef\\xff\\xff\\xff"
-    #end
     FIDIUS::PacketLogger.log_packet(self,buf,module_instance)
-
 	  super(buf, opts)
   end
 
@@ -390,5 +351,3 @@ module SocketTracer
   end
 end #SocketTracer
 end #FIDIUS
-
-

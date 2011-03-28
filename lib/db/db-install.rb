@@ -11,12 +11,12 @@ module FIDIUS
       self.connection_data
 
       begin
-        self.drop_database @connection_data
+        self.drop_database @connection_data['evasion_db']
       rescue
         puts "DB drop: Could not find database #{@connection_data['database']}"
       end
 
-      self.create_database @connection_data
+      self.create_database @connection_data['evasion_db']
 
       self.with_db do
         ActiveRecord::Migrator.migrate(migrations_path, ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
@@ -24,12 +24,12 @@ module FIDIUS
     end
 
     def connection_data
-      @connection_data ||= YAML.load_file("#{@CFG_D}/database.yml")['evasion_db']
+      @connection_data ||= YAML.load_file("#{@CFG_D}/database.yml")
     end
 
     def with_db &block
       begin
-        ActiveRecord::Base.establish_connection(connection_data)
+        ActiveRecord::Base.establish_connection(connection_data['evasion_db'])
         ActiveRecord::Base.logger = Logger.new(STDOUT)
         ActiveRecord::Base.logger.level = Logger::WARN
         yield connection_data

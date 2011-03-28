@@ -59,8 +59,8 @@ CREATE TABLE "Prelude_Alertident" (
 
 CREATE TABLE "Prelude_Analyzer" (
   "_message_ident" bigint(20)  NOT NULL,
-  "_parent_type" varchar(255) NOT NULL,
-  "_index" tinyint(4) NOT NULL,
+  "_parent_type" varchar(255) DEFAULT NULL,
+  "_index" tinyint(4) DEFAULT NULL,
   "analyzerid" varchar(255) DEFAULT NULL,
   "name" varchar(255) DEFAULT NULL,
   "manufacturer" varchar(255) DEFAULT NULL,
@@ -145,8 +145,8 @@ CREATE TABLE "Prelude_CreateTime" (
 CREATE TABLE "Prelude_DetectTime" (
   "_message_ident" bigint(20)  NOT NULL,
   "time" datetime NOT NULL,
-  "usec" int(10)  NOT NULL,
-  "gmtoff" int(11) NOT NULL,
+  "usec" int(10)  DEFAULT NULL,
+  "gmtoff" int(11) DEFAULT NULL,
   PRIMARY KEY ("_message_ident")
 );
 
@@ -211,7 +211,7 @@ CREATE TABLE "Prelude_Impact" (
   "description" text,
   "severity" varchar(255) DEFAULT NULL,
   "completion" varchar(255) DEFAULT NULL,
-  "type" varchar(255) NOT NULL,
+  "type" varchar(255) DEFAULT NULL,
   PRIMARY KEY ("_message_ident")
 );
 
@@ -318,8 +318,8 @@ CREATE TABLE "Prelude_Reference" (
 
 CREATE TABLE "Prelude_Service" (
   "_message_ident" bigint(20)  NOT NULL,
-  "_parent_type" varchar(255) NOT NULL,
-  "_parent0_index" smallint(6) NOT NULL,
+  "_parent_type" varchar(255) DEFAULT NULL,
+  "_parent0_index" smallint(6) DEFAULT NULL,
   "ident" varchar(255) DEFAULT NULL,
   "ip_version" tinyint(3)  DEFAULT NULL,
   "name" varchar(255) DEFAULT NULL,

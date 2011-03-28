@@ -63,8 +63,6 @@ class TestKnowledge < Test::Unit::TestCase
 
     assert_equal 1, FIDIUS::EvasionDB::Knowledge.get_events.size
     assert_equal event, FIDIUS::EvasionDB::Knowledge.get_event(event.id)
-    puts "#{packet.id}"
-    puts FIDIUS::EvasionDB::Knowledge.get_packet(packet.id).inspect
     assert_equal packet, FIDIUS::EvasionDB::Knowledge.get_packet(packet.id)
 
     assert_equal event, FIDIUS::EvasionDB::Knowledge.get_event(event.id)
