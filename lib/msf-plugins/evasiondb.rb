@@ -1,6 +1,6 @@
 # encoding: UTF-8
 module Msf
-class Plugin::EvasionTester < Msf::Plugin
+class Plugin::EvasionDB < Msf::Plugin
   class ConsoleCommandDispatcher
     include Msf::Ui::Console::CommandDispatcher
     def name
@@ -196,7 +196,7 @@ class Plugin::EvasionTester < Msf::Plugin
     FIDIUS::PacketLogger.on_log do |caused_by, data, socket|
       FIDIUS::EvasionDB.current_recorder.log_packet(caused_by,data,socket)
     end
-    print_status("EvasionTester plugin loaded.")
+    print_status("EvasionDB plugin loaded.")
   end
 
   def cleanup
@@ -204,11 +204,11 @@ class Plugin::EvasionTester < Msf::Plugin
   end
 
   def name
-    "EvasionTester"
+    "FIDIUS-EvasionDB"
   end
 
   def desc
-    "DESC"
+    ""
   end
 end
 

@@ -24,5 +24,16 @@ module FIDIUS::EvasionDB::Knowledge
       end
       attack_module
     end
+
+    def has_option(k,v)
+      attack_options.find_by_option_key_and_option_value(k,v) != nil
+    end
+
+    def has_options(options = {})
+      options.each do |k,v|
+        return false if !self.has_option(k,v)
+      end
+      true
+    end
   end
 end

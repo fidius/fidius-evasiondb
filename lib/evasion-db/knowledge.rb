@@ -26,13 +26,36 @@ module FIDIUS
         FIDIUS::EvasionDB::LogMatchesHelper.find_packets_for_event(event,Packet.all)
       end
 
-      FIND_MIN = 1
-      FIND_MAX = 2
+      MIN_EVENTS = 1
+      MAX_EVENTS = 2
       
-      def self.find_events_for_exploit(name,options=[],result = FIND_MIN)
-        e = AttackModule.find_all_by_name(name)
-        if e.size > 0
-          return e
+      def self.find_events_for_exploit(name,options={},result = MIN_EVENTS)
+        attacks = AttackModule.find_all_by_name(name).delete_if do |attack|
+          !attack.has_options(options)
+        end
+
+        if attacks.size > 0
+          res = nil
+          if result == MIN_EVENTS
+            min_cnt = 1073741823 #max value
+            attacks.each do |attack|
+              events_cnt = attack.idmef_events.size
+              if events_cnt < min_cnt
+                min_cnt = events_cnt
+                res = attack
+              end
+            end
+          elsif result == MAX_EVENTS
+            min_cnt = 0 #min value
+            attacks.each do |attack|
+              events_cnt = attack.idmef_events.size
+              if events_cnt > min_cnt
+                min_cnt = events_cnt
+                res = attack
+              end
+            end
+          end
+          return res.idmef_events if result
         end
         nil
       end
