@@ -1,8 +1,8 @@
 class CreateIdmefEvents < ActiveRecord::Migration
   def self.up
     create_table :idmef_events do |t|
-      t.integer :exploit_id
-      t.integer :exploit_payload_id
+      t.integer :attack_id
+      t.integer :attack_payload_id
       t.column :payload, :binary
       t.datetime :detect_time
       t.string :dest_ip

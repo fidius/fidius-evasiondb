@@ -148,7 +148,7 @@ class Plugin::EvasionTester < Msf::Plugin
       exploits.each do |exploit|
         events = exploit.idmef_events
         print_line "-"*60
-        print_line "#{exploit.name} with #{exploit.exploit_options.size} options"
+        print_line "#{exploit.name} with #{exploit.attack_options.size} options"
         print_line "-"*60
         print_line "#{events.size} idmef-events fetched"
         print_line "-"*60

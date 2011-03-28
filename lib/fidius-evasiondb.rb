@@ -1,10 +1,18 @@
-#require 'rubygems'
-require "rubygems"
-require "bundler"
+require 'rubygems'
+gemfile = File.expand_path('../../Gemfile', __FILE__)
+ENV['BUNDLE_GEMFILE'] = gemfile
+require 'bundler'
 Bundler.setup
+
+#require 'rubygems'
+#require "rubygems"
+#require "bundler"
+#gemfile = File.expand_path('../../Gemfile', __FILE__)
+#Bundler.setup#(:default,:ci)
+
 require 'logger'
-#require 'active_record'
-#require 'fidius-common'
+require 'active_record'
+require 'fidius-common'
 
 module FIDIUS
   module EvasionDB

@@ -1,7 +1,7 @@
 module FIDIUS::EvasionDB::Knowledge
   class IdmefEvent < FIDIUS::EvasionDB::Knowledge::Connection
     belongs_to :exploit
-    belongs_to :exploit_payload
+    belongs_to :attack_payload
 
     def self.table_name
       "idmef_events"

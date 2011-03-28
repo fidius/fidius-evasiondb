@@ -1,6 +1,6 @@
-class CreateExploits < ActiveRecord::Migration
+class CreateAttackModules < ActiveRecord::Migration
   def self.up
-    create_table :exploits do |t|
+    create_table :attack_modules do |t|
       t.string :name
       t.string :options_hash
       t.boolean :finished, :default=>false
@@ -9,6 +9,6 @@ class CreateExploits < ActiveRecord::Migration
   end
 
   def self.down
-    drop_table :exploits
+    drop_table :attack_modules
   end
 end

@@ -2,7 +2,7 @@ module FIDIUS
   module EvasionDB
     module MsfRecorder
       def module_started(module_instance)
-        @@current_exploit = FIDIUS::EvasionDB::Knowledge::Exploit.find_or_create_by_name_and_options(module_instance.fullname,module_instance.datastore)
+        @@current_exploit = FIDIUS::EvasionDB::Knowledge::AttackModule.find_or_create_by_name_and_options(module_instance.fullname,module_instance.datastore)
         FIDIUS::EvasionDB.current_fetcher.begin_record
       end
 
@@ -26,8 +26,8 @@ module FIDIUS
               # meterpreter is not a module and does not respond to fullname 
               # we handle this seperatly
             elsif module_instance == "Meterpreter"
-              $logger.debug "exploit_payload.idmef_events << #{idmef_event}"
-              @@current_exploit.exploit_payload.idmef_events << idmef_event
+              $logger.debug "attack_payload.idmef_events << #{idmef_event}"
+              @@current_exploit.attack_payload.idmef_events << idmef_event
             end
           end
           @@current_exploit.finished = true
@@ -60,8 +60,8 @@ module FIDIUS
           # we handle this seperatly
           elsif module_instance == "Meterpreter"
             $logger.debug "module_instance is meterpreter"
-            $logger.debug "putting package to exploit_payload"
-            @@current_exploit.exploit_payload.packets << FIDIUS::EvasionDB::Knowledge::Packet.create(:payload=>data,:src_addr=>socket.localhost,:src_port=>socket.localport,:dest_addr=>socket.peerhost,:dest_port=>socket.peerport)
+            $logger.debug "putting package to attack_payload"
+            @@current_exploit.attack_payload.packets << FIDIUS::EvasionDB::Knowledge::Packet.create(:payload=>data,:src_addr=>socket.localhost,:src_port=>socket.localport,:dest_addr=>socket.peerhost,:dest_port=>socket.peerport)
             @@current_exploit.save
           end
           $logger.debug "LOG: #{module_instance} #{data.size} Bytes on #{socket}"
