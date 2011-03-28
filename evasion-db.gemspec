@@ -4,7 +4,7 @@ require "evasion-db/version"
 
 Gem::Specification.new do |s|
   s.name        = "fidius-evasiondb"
-  s.version     = Evasion::Db::VERSION
+  s.version     = FIDIUS::EvasionDB::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Jens Färber, Bernhard Katzmarski"]
   s.email       = ["jfaerber@tzi.de, bkatzm@tzi.de"]
