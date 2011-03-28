@@ -95,8 +95,17 @@ IDMEF-Events will be fetched from the Prelude-Database and stored to the Knowled
 * Only queries possible
 
 ### Queries
-
-* list and explain available queries
+Sample how the knowledge in EvasionDB can be queried:
+        ruby-1.9.1-p378 > require 'fidius-evasiondb'
+         => true 
+        ruby-1.9.1-p378 > FIDIUS::EvasionDB.config "data/database.yml"
+        ruby-1.9.1-p378 > events = FIDIUS::EvasionDB::Knowledge.find_events_for_exploit "exploit/windows/smb/ms08_067_netapi"
+        ruby-1.9.1-p378 > events.size
+         => 11 
+        ruby-1.9.1-p378 > events.first.severity
+         => "medium" 
+        ruby-1.9.1-p378 > events.first.text
+         => "COMMUNITY SIP TCP/IP message flooding directed to SIP proxy" 
 
 ## Authors and Contact
 
@@ -105,8 +114,8 @@ fidius-evasiondb was written by
 * FIDIUS Intrusion Detection with Intelligent User Support
   <grp-fidius@tzi.de>, <http://fidius.me>
 * in particular:
- * Bernhard Katzmarski <bkatzm+fidius-evasiondb@tzi.de>
- * Jens Färber <jfaerber+fidius-evasiondb@tzi.de>
+ * Bernhard Katzmarski <bkatzm@tzi.de>
+ * Jens Färber <jfaerber@tzi.de>
 
 If you have any questions, remarks, suggestion, improvements,
 etc. feel free to drop a line at the addresses given above.

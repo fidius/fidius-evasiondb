@@ -25,10 +25,6 @@ module FIDIUS
       else
         FIDIUS::EvasionDB::Knowledge::Connection.establish_connection evasion_db
         FIDIUS::EvasionDB::Knowledge::Connection.connection
-
-        FIDIUS::EvasionDB::Fetcher.all.each do |fetcher|
-          fetcher.config(@@yml_config)
-        end
       end
     end
 
@@ -51,6 +47,7 @@ module FIDIUS
     def self.use_fetcher(fetcher_name)
       raise "not configured. use FIDIUS::EvasionDB.config first" unless @@yml_config
       @@current_fetcher = Fetcher.by_name(fetcher_name)
+      @@current_fetcher.config(@@yml_config)
       raise "fetcher #{recorder_name} not found" unless @@current_fetcher    
     end
 
