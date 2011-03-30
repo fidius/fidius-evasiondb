@@ -82,21 +82,21 @@ class TestKnowledge < Test::Unit::TestCase
     a.idmef_events << IdmefEvent.create(:text=>"ET EXPLOIT x86 JmpCallAdditive Encoder")
     a.idmef_events << IdmefEvent.create(:text=>"COMMUNITY SIP TCP/IP message flooding directed to SIP")
     a.save
-    assert 3, a.idmef_events.size
+    assert_equal 3, a.idmef_events.size
     a = AttackModule.find_or_create_by_name_and_options(name,{"Payload"=>"windows/messagebox","RHOST"=>"10.20.20.1"})
     a.idmef_events << IdmefEvent.create(:text=>"COMMUNITY SIP TCP/IP message flooding directed to SIP")
     a.save
-    assert 1, a.idmef_events.size
+    assert_equal 1, a.idmef_events.size
 
     events = FIDIUS::EvasionDB::Knowledge.find_events_for_exploit(name)
-    assert 1,events.size
-    assert "COMMUNITY SIP TCP/IP message flooding directed to SIP", events.first.text
+    assert_equal 1,events.size
+    assert_equal "COMMUNITY SIP TCP/IP message flooding directed to SIP", events.first.text
 
     events = FIDIUS::EvasionDB::Knowledge.find_events_for_exploit(name,{},FIDIUS::EvasionDB::Knowledge::MAX_EVENTS)
-    assert 3,events.size
+    assert_equal 3,events.size
 
     events = FIDIUS::EvasionDB::Knowledge.find_events_for_exploit(name,{"Payload"=>"windows/messagebox"},FIDIUS::EvasionDB::Knowledge::MAX_EVENTS)
-    assert 1,events.size
+    assert_equal 1,events.size
     
   end
 end
