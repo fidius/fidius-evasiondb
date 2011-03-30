@@ -30,7 +30,7 @@ module FIDIUS
     end
 
     def self.prepare_test_db
-      File.delete($yml_config["evasion_db"]["database"]) if !File.exists?($yml_config["evasion_db"]["database"])
+      File.delete($yml_config["evasion_db"]["database"]) if File.exists?($yml_config["evasion_db"]["database"])
       db_config_path = File.join(TEST_DIR, 'config')
       migrations_path = File.join(LIB_DIR, 'db', 'migrations')
       #delete and migrate new test db
