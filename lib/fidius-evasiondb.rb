@@ -6,7 +6,7 @@ require 'fidius-common'
 module FIDIUS
   module EvasionDB
     $logger = Logger.new(STDOUT)
-    $logger.level = Logger::ERROR
+    $logger.level = Logger::DEBUG
     $logger.debug "geht los"
     GEM_BASE      = File.expand_path('..', __FILE__)
     require (File.join GEM_BASE, 'evasion-db','log_matches_helper.rb')
