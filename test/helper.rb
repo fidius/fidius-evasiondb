@@ -2,7 +2,7 @@ require 'rubygems'
 require 'sqlite3'
 require 'simplecov'
 TEST_DIR = File.dirname(File.expand_path(__FILE__))
-LIB_DIR = File.join File.dirname(__FILE__),"..","lib"
+LIB_DIR = File.expand_path(File.join File.dirname(__FILE__),"..","lib") #File.join File.dirname(__FILE__),"..","lib"
 
 SimpleCov.add_group 'Core', "./lib/evasion-db"
 SimpleCov.add_group 'Knowledge', "./lib/evasion-db/knowledge/*"
@@ -13,10 +13,10 @@ SimpleCov.add_filter "./lib/db/*"
 SimpleCov.start
 
 require 'test/unit'
-$LOAD_PATH.unshift LIB_DIR
-require 'lib/fidius-evasiondb'
-require 'db/db-install'
-require 'preludedb_helper.rb'
+#$LOAD_PATH.unshift LIB_DIR
+require "#{LIB_DIR}/fidius-evasiondb"
+require "#{LIB_DIR}/db/db-install"
+require "#{TEST_DIR}/preludedb_helper.rb"
 
 module FIDIUS
   module EvasionDB
