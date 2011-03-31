@@ -1,4 +1,4 @@
-require 'helper'
+require_relative 'helper'
 class TestPreludeDB < Test::Unit::TestCase
   def test_prelude_event
     PreludeDBHelper.setup_prelude_db($yml_config["ids_db"])

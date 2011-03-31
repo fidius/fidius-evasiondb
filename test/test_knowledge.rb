@@ -1,4 +1,4 @@
-require 'helper'
+require_relative 'helper'
 class TestKnowledge < Test::Unit::TestCase
   include FIDIUS::EvasionDB::Knowledge
 
@@ -45,7 +45,7 @@ class TestKnowledge < Test::Unit::TestCase
     packet = Packet.create
     assert_equal [], packet.payload
     packet = Packet.create(:payload=>payload)
-    assert_equal payload, packet.payload 
+    assert_equal payload, packet.payload
   end
 
   def test_finders
@@ -57,7 +57,7 @@ class TestKnowledge < Test::Unit::TestCase
     exploit = AttackModule.create(:name=>"exploit")
     packet = Packet.create(:payload=>payload)
     event = IdmefEvent.create(:text=>"testexploit",:payload=>payload)
-    
+
     assert_equal 1,FIDIUS::EvasionDB::Knowledge.get_exploits.size
     assert_equal packet, FIDIUS::EvasionDB::Knowledge.get_packet(packet.id)
 
@@ -97,6 +97,6 @@ class TestKnowledge < Test::Unit::TestCase
 
     events = FIDIUS::EvasionDB::Knowledge.find_events_for_exploit(name,{"Payload"=>"windows/messagebox"},FIDIUS::EvasionDB::Knowledge::MAX_EVENTS)
     assert_equal 1,events.size
-    
+
   end
 end

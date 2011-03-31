@@ -1,5 +1,7 @@
-require 'bundler'
-Bundler::GemHelper.install_tasks
+unless __FILE__.include? ENV['GEM_HOME']
+  require 'bundler'
+  Bundler::GemHelper.install_tasks
+end
 
 require 'rake/testtask'
 Rake::TestTask.new(:test) do |test|
@@ -7,10 +9,3 @@ Rake::TestTask.new(:test) do |test|
   test.pattern = 'test/**/test_*.rb'
   test.verbose = true
 end
-
-#TEST_FILE = File.join('test', 'test_runner.rb')
-
-#desc 'Test functionality of the gem.'
-#task :test do
-#  sh "ruby #{TEST_FILE}"
-#end
