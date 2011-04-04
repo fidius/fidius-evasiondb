@@ -29,23 +29,24 @@ class Plugin::EvasionDB < Msf::Plugin
         "fetch_events" => "fetch events which were created in the meanwhile",
         "show_events" => "shows all fetched idmef-events",
         "show_event" => "shows information about an idmef-event",
+        "show_events_for_payload" => "shows the events raised by the given payload",
         "show_packet" => "shows information about a packet",
         "send_packet" => "send a given packet to generate false positive",
         "send_event_payload" => "send a given payload of an idmef-event to generate false positive"
       }
     end
 
-	def to_hex_dump(str, from=-1, to=-1)
+  def to_hex_dump(str, from=-1, to=-1)
     width=16
-		buf = ''
-		idx = 0
-		cnt = 0
-		snl = false
-		lst = 0
+    buf = ''
+    idx = 0
+    cnt = 0
+    snl = false
+    lst = 0
     rclosed = true
-		while (idx < str.length)      
-			chunk = str[idx, width]
-			line  = chunk.unpack("H*")[0].scan(/../).join(" ")
+    while (idx < str.length)
+      chunk = str[idx, width]
+      line  = chunk.unpack("H*")[0].scan(/../).join(" ")
       if from >= idx && from < idx+width
         line[(idx-from).abs*3] = "%bld%red#{line[(idx-from).abs*3]}"
       end
@@ -59,42 +60,42 @@ class Plugin::EvasionDB < Msf::Plugin
           line[line.length-1] = "#{line[line.length-1]}%clr"
         end
       end
-			buf << line
+      buf << line
 
       line_length = line.gsub("%bld%red","").gsub("%clr","").length
-			if (lst == 0)
-				lst = line_length
-				buf << " " * 4
-			else
-				buf << " " * ((lst - line_length) + 4).abs
-			end
+      if (lst == 0)
+        lst = line_length
+        buf << " " * 4
+      else
+        buf << " " * ((lst - line_length) + 4).abs
+      end
 
       index = 0
-			chunk.unpack("C*").each do |c|
+      chunk.unpack("C*").each do |c|
         if from >= idx && from < idx+width && (idx-from).abs == index || !rclosed
           buf << "%bld%red"
           rclosed = false
         end
 
-				if (c >	0x1f and c < 0x7f)
-					buf << c.chr
-				else
-					buf << "."
-				end
+        if (c > 0x1f and c < 0x7f)
+          buf << c.chr
+        else
+          buf << "."
+        end
         if to >= idx && to < idx+width && (idx-to).abs == index
           buf << "%clr"
           rclosed = true
         end
 
         index = index+1
-			end
-			buf << "\n"
+      end
+      buf << "\n"
 
-			idx += width
-		end
+      idx += width
+    end
     buf << "%clr" unless rclosed
-		buf << "\n"
-	end
+    buf << "\n"
+  end
 
     def send_payload_to_host(payload,host,port)
       begin
@@ -136,9 +137,20 @@ class Plugin::EvasionDB < Msf::Plugin
     def cmd_show_packet(*args)
       raise "please provide packet_id" if args.size != 1
       packet = FIDIUS::EvasionDB::Knowledge::Packet.find(args[0].to_i)
-      
+
       hex = to_hex_dump(packet.payload)
       print_line hex
+    end
+
+    def cmd_show_events_for_payload(*args)
+      raise "please provide a payload string" if args.size != 1
+      payload = args[0]
+      print_line "Search for events which contain the payload #{payload}"
+      events = FIDIUS::EvasionDB::Knowledge.get_events_for_payload(payload)
+      print_line "Found #{events.size} events"
+      events.each do |e|
+        print_line "(#{e.id})#{e.text} | Severity:#{e.severity} with #{e.payload_size} bytes payload"
+      end
     end
 
     def cmd_show_event(*args)
@@ -158,7 +170,7 @@ class Plugin::EvasionDB < Msf::Plugin
       print_line "#{packet[:packet].payload.size} bytes"
       print_line "match #{packet[:index]} - #{packet[:index]+packet[:length]-1}"
       hex = to_hex_dump(packet[:packet].payload,packet[:index],packet[:index]+packet[:length]-1)
-      print_line hex      
+      print_line hex
       print_line "EVENT PAYLOAD(#{event.payload.size}) bytes:"
       hex = to_hex_dump(event.payload)
       print_line hex
@@ -229,34 +241,34 @@ class PacketLogger
   end
 
   def self.inspect_socket(socket)
-    "#{socket.localhost}:#{socket.localport} -> #{socket.peerhost}:#{socket.peerport}"    
+    "#{socket.localhost}:#{socket.localport} -> #{socket.peerhost}:#{socket.peerport}"
   end
 
   class MySocketEventHandler
-	  include Rex::Socket::Comm::Events
+    include Rex::Socket::Comm::Events
 
     def initialize
 
     end
 
-	  def on_before_socket_create(comm, param)
-	  end
+    def on_before_socket_create(comm, param)
+    end
 
-	  def on_socket_created(comm, sock, param)
-		  sock.extend(FIDIUS::SocketTracer)
-		  sock.context = param.context
-		  sock.params = param
-		  sock.initlog
-	  end
+    def on_socket_created(comm, sock, param)
+      sock.extend(FIDIUS::SocketTracer)
+      sock.context = param.context
+      sock.params = param
+      sock.initlog
+    end
   end
 
   def self.init_with_framework(framework)
-	  $eh = MySocketEventHandler.new
-	  Rex::Socket::Comm::Local.register_event_handler($eh)
+    $eh = MySocketEventHandler.new
+    Rex::Socket::Comm::Local.register_event_handler($eh)
   end
 
   def self.cleanup
-	  Rex::Socket::Comm::Local.deregister_event_handler($eh)
+    Rex::Socket::Comm::Local.deregister_event_handler($eh)
   end
 end #PacketLogger
 
@@ -264,25 +276,25 @@ class ModuleRunCallback
   def on_module_run(instance)
     FIDIUS::EvasionDB.current_recorder.module_started(instance)
   end
-	#
-	# Called when a module finishes
-	#
-	def on_module_complete(instance)
+  #
+  # Called when a module finishes
+  #
+  def on_module_complete(instance)
     FIDIUS::EvasionDB.current_recorder.module_completed(instance)
-	end
+  end
 
-	#
-	# Called when a module raises an exception
-	#
-	def on_module_error(instance, exception)
+  #
+  # Called when a module raises an exception
+  #
+  def on_module_error(instance, exception)
     FIDIUS::EvasionDB.current_recorder.module_error(instance,exception)
-	end
+  end
 end #class ModuleRunCallback
 
 end #FIDIUS
 
 # This extends the PacketDispatcher from Rex
-# with Logging 
+# with Logging
 # Original Source is: lib/rex/post/meterpreter/packet_dispatcher.rb
 module Rex::Post::Meterpreter::PacketDispatcher
   def send_packet(packet, completion_routine = nil, completion_param = nil)
@@ -305,7 +317,7 @@ module Rex::Post::Meterpreter::PacketDispatcher
         @finish = true
 
         # Reraise the error to the top-level caller
-        raise e		
+        raise e
       end
     end
 
@@ -325,17 +337,17 @@ module SocketTracer
   def write(buf, opts = {})
     module_instance = context['MsfExploit'] if context['MsfExploit']
     FIDIUS::PacketLogger.log_packet(self,buf,module_instance)
-	  super(buf, opts)
+    super(buf, opts)
   end
 
   # Hook the read method
   def read(length = nil, opts = {})
-	  r = super(length, opts)
-	  return r
+    r = super(length, opts)
+    return r
   end
 
   def close(*args)
-	  super(*args)
+    super(*args)
   end
 
   def initlog
