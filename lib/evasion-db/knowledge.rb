@@ -41,6 +41,17 @@ module FIDIUS
         Packet.find(pid)
       end
 
+      # returns all exploits for the given service
+      #
+      #@param [integer] port
+      def self.find_exploits_for_service(port)
+        option_set = AttackOption.where(:option_key => "RPORT",
+                                        :option_value => port)
+        exploits = []
+        option_set.each { |opt| exploits << opt.attack_module }
+        exploits
+      end
+
       # returns the packets which might be responsible for the given event
       #
       # @param [integer] event id
@@ -50,7 +61,8 @@ module FIDIUS
       end
 
       # find out the events raised by the given payload
-      #@param [string] payload in hex style
+      #
+      #@param [string] payload
       def self.get_events_for_payload(payload)
         #TODO: Search all packets which belong to this event
         events = []
