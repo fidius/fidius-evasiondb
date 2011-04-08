@@ -6,7 +6,7 @@ module FIDIUS::EvasionDB::Knowledge
     has_many :idmef_events, :dependent=>:destroy
     has_many :packets, :dependent=>:destroy
     has_many :attack_options, :dependent=>:destroy
-    has_one :attack_payload
+    has_one :attack_payload, :dependent=>:destroy
 
     def self.table_name
       "attack_modules"

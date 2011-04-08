@@ -68,9 +68,9 @@ module FIDIUS
           end
           $logger.debug "LOG: #{module_instance} #{data.size} Bytes on #{socket}"
         rescue ActiveRecord::StatementInvalid
-          $logger.error "#{$!.message}"
+          $logger.error "StatementInvalid"
         rescue 
-          $logger.error "error: #{$!.inspect}:#{$!.backtrace}"
+          $logger.error "error:" # "#{$!.message}" ##{$!.inspect}:#{$!.backtrace}"
         end
       end
 

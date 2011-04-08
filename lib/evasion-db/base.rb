@@ -12,6 +12,22 @@ module FIDIUS
     @@current_fetcher = nil
     @@current_recorder = nil
 
+    #def self.load_db_adapter(adapter)
+      #$logger.debug "load adapter #{adapter}"
+      #case adapter
+      #  when 'sqlite3'
+      #    ::Bundler.require(:adapter_sqlite3)
+      #  when 'postgresql'
+      #    ::Bundler.require(:adapter_postgres)
+      #  when 'mysql'
+      #    ::Bundler.require(:adapter_mysql)
+      #  when 'mysql2'
+      #    ::Bundler.require(:adapter_mysql2)
+      #else
+      #  raise "Don't know what gem to use for adapter #{adapter}"
+      #end
+    #end
+
     # Configures EvasionDB. 
     #
     # @param [String] path to an yml-file containing db-connection settings for ids_db and evasion_db
@@ -23,6 +39,7 @@ module FIDIUS
       unless evasion_db
         raise "no evasion_db part found in file"
       else
+        #self.load_db_adapter(evasion_db['adapter'])
         FIDIUS::EvasionDB::Knowledge::Connection.establish_connection evasion_db
         FIDIUS::EvasionDB::Knowledge::Connection.connection
       end

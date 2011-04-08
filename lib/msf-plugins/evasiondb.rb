@@ -31,8 +31,15 @@ class Plugin::EvasionDB < Msf::Plugin
         "show_event" => "shows information about an idmef-event",
         "show_packet" => "shows information about a packet",
         "send_packet" => "send a given packet to generate false positive",
-        "send_event_payload" => "send a given payload of an idmef-event to generate false positive"
+        "send_event_payload" => "send a given payload of an idmef-event to generate false positive",
+        "config_exploit" => "configures an exploit with the options of a previous runtime",
+        "delete_events" => "deletes events from knowledge",
+        "set_autologging" => "true|false automatically log all executed modules"
       }
+    end
+
+    def run_cmd(cmd)
+      $console.run_single(cmd)
     end
 
 	def to_hex_dump(str, from=-1, to=-1)
@@ -123,13 +130,33 @@ class Plugin::EvasionDB < Msf::Plugin
       exploits.each do |exploit|
         events = exploit.idmef_events
         print_line "-"*60
-        print_line "#{exploit.name} with #{exploit.attack_options.size} options"
+        print_line "(#{exploit.id})#{exploit.name} with #{exploit.attack_options.size} options"
         print_line "-"*60
         print_line "#{events.size} idmef-events fetched"
         print_line "-"*60
         events.each do |event|
           print_line "(#{event.id})#{event.text} with #{event.payload_size} bytes payload"
         end
+      end
+    end
+
+    def cmd_set_autologging(*args)
+      raise "please use set_autologging true|false" if args.size != 1
+      $auto_logging = args[0] == true
+    end
+
+    def cmd_delete_events(*args)
+      raise "please provide id" if args.size != 1
+      exploit = FIDIUS::EvasionDB::Knowledge.get_exploit(args[0].to_i)
+      exploit.destroy
+    end
+
+    def cmd_config_exploit(*args)
+      raise "please provide id" if args.size != 1
+      exploit = FIDIUS::EvasionDB::Knowledge.get_exploit(args[0].to_i)
+      run_cmd("use #{exploit.name}")
+      exploit.attack_options.each do |option|
+        run_cmd("set #{option.option_key} #{option.option_value}")
       end
     end
 
@@ -148,33 +175,37 @@ class Plugin::EvasionDB < Msf::Plugin
       event = FIDIUS::EvasionDB::Knowledge.get_event(event_id)
       packet = FIDIUS::EvasionDB::Knowledge.get_packet_for_event(event_id)
       print_line "(#{event.id}) Event(#{event.text}) : #{event.payload_size} bytes payload"
-      unless packet
+      if packet
+        print_line "#{packet.inspect}"
+        print_line "#{packet[:packet].inspect}"
+        print_line "PACKET(#{packet[:packet].id}): "
+        print_line "#{packet[:packet].payload.size} bytes"
+        print_line "match #{packet[:index]} - #{packet[:index]+packet[:length]-1}"
+        hex = to_hex_dump(packet[:packet].payload,packet[:index],packet[:index]+packet[:length]-1)
+        print_line hex      
+      else
         print_line "no packets available"
-        return
       end
-      print_line "#{packet.inspect}"
-      print_line "#{packet[:packet].inspect}"
-      print_line "PACKET(#{packet[:packet].id}): "
-      print_line "#{packet[:packet].payload.size} bytes"
-      print_line "match #{packet[:index]} - #{packet[:index]+packet[:length]-1}"
-      hex = to_hex_dump(packet[:packet].payload,packet[:index],packet[:index]+packet[:length]-1)
-      print_line hex      
       print_line "EVENT PAYLOAD(#{event.payload.size}) bytes:"
       hex = to_hex_dump(event.payload)
       print_line hex
     end
 
     def cmd_fetch_events(*args)
-      events = FIDIUS::EvasionDB::Knowledge.fetch_events
+      #events = FIDIUS::EvasionDB::Knowledge.fetch_events
+      FIDIUS::EvasionDB.current_fetcher.local_ip = nil
+      events = FIDIUS::EvasionDB.current_fetcher.fetch_events
       if events
         print_status "#{events.size} events generated"
         print_status
         events.each do |e|
+          print_line "(#{e.id}) Event(#{e.text}) : #{e.payload_size} bytes payload (#{e.src_ip} -> #{e.dest_ip})"
           print_status "#{e}"
         end
       else
         print_status "0 events generated"
       end
+      FIDIUS::EvasionDB.current_fetcher.begin_record
     end
   end
 
@@ -185,6 +216,8 @@ class Plugin::EvasionDB < Msf::Plugin
     dbconfig_path = File.join(msf_home,"data","database.yml")
     raise "no database.yml in #{dbconfig_path}" if !File.exists?(dbconfig_path)
 
+    $console = opts['ConsoleDriver']
+    $auto_logging = true
     FIDIUS::EvasionDB.config(dbconfig_path)
     FIDIUS::EvasionDB.use_recoder "Msf-Recorder"
     FIDIUS::EvasionDB.use_fetcher "PreludeDB"
@@ -196,6 +229,7 @@ class Plugin::EvasionDB < Msf::Plugin
     FIDIUS::PacketLogger.on_log do |caused_by, data, socket|
       FIDIUS::EvasionDB.current_recorder.log_packet(caused_by,data,socket)
     end
+    FIDIUS::EvasionDB.current_fetcher.begin_record
     print_status("EvasionDB plugin loaded.")
   end
 
@@ -262,20 +296,20 @@ end #PacketLogger
 
 class ModuleRunCallback
   def on_module_run(instance)
-    FIDIUS::EvasionDB.current_recorder.module_started(instance)
+    FIDIUS::EvasionDB.current_recorder.module_started(instance) if $auto_logging
   end
 	#
 	# Called when a module finishes
 	#
 	def on_module_complete(instance)
-    FIDIUS::EvasionDB.current_recorder.module_completed(instance)
+    FIDIUS::EvasionDB.current_recorder.module_completed(instance) if $auto_logging
 	end
 
 	#
 	# Called when a module raises an exception
 	#
 	def on_module_error(instance, exception)
-    FIDIUS::EvasionDB.current_recorder.module_error(instance,exception)
+    FIDIUS::EvasionDB.current_recorder.module_error(instance,exception) if $auto_logging
 	end
 end #class ModuleRunCallback
 

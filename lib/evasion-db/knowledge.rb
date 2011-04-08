@@ -15,6 +15,10 @@ module FIDIUS
         AttackModule.all
       end
 
+      def self.get_exploit(id)
+        AttackModule.find(id)
+      end
+
       # finds a packet within an id
       #
       #@param [integer] packet id

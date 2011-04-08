@@ -4,6 +4,7 @@ module FIDIUS
       def config(conf)
         $logger.debug "INIT PRELUDE EVENT FETCHER"
  	      ids_db = conf['ids_db']
+        #FIDIUS::EvasionDB.load_db_adapter(ids_db['adapter'])
         raise "no ids_db part found" unless ids_db
         FIDIUS::PreludeDB::Connection.establish_connection ids_db
         connection = FIDIUS::PreludeDB::Connection.connection
@@ -18,16 +19,22 @@ module FIDIUS
       end
 
       def get_events
-        raise "no local ip given" if @local_ip == nil
+        #raise "no local ip given" if @local_ip == nil
         raise "please begin_record before fetching" if @start_time == nil
         res = Array.new
+        sleep 3
         $logger.debug "alert.find(:all,:joins=>[:detect_time],time > #{@start_time})"
         events = FIDIUS::PreludeDB::Alert.find(:all,:joins => [:detect_time],:order=>"time DESC",:conditions=>["time > :d",{:d => @start_time}])
         $logger.debug "found #{events.size} events"
         events.each do |event|
           ev = FIDIUS::PreludeDB::PreludeEvent.new(event)
           $logger.debug "Event #{ev.source_ip} -> #{ev.dest_ip}  local_ip:#{@local_ip}"
-          if ev.source_ip == @local_ip || ev.dest_ip == @local_ip
+          if @local_ip
+            if (ev.source_ip == @local_ip || ev.dest_ip == @local_ip)
+              $logger.debug "adding #{ev.inspect} to events "
+              res << ev  
+            end
+          else
             $logger.debug "adding #{ev.inspect} to events "
             res << ev
           end

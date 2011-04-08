@@ -1,17 +1,19 @@
-require 'rubygems'
-require 'sqlite3'
-require 'simplecov'
+#require 'rubygems'
+#require 'sqlite3'
+
 TEST_DIR = File.dirname(File.expand_path(__FILE__))
 LIB_DIR = File.expand_path(File.join File.dirname(__FILE__),"..","lib") #File.join File.dirname(__FILE__),"..","lib"
+begin
+  SimpleCov.add_group 'Core', "./lib/evasion-db"
+  SimpleCov.add_group 'Knowledge', "./lib/evasion-db/knowledge/*"
+  SimpleCov.add_group 'Fetchers', "./lib/evasion-db/idmef-fetchers/*"
+  SimpleCov.add_group 'Recorders', "./lib/evasion-db/recorders/*"
 
-SimpleCov.add_group 'Core', "./lib/evasion-db"
-SimpleCov.add_group 'Knowledge', "./lib/evasion-db/knowledge/*"
-SimpleCov.add_group 'Fetchers', "./lib/evasion-db/idmef-fetchers/*"
-SimpleCov.add_group 'Recorders', "./lib/evasion-db/recorders/*"
-
-SimpleCov.add_filter "./lib/db/*"
-SimpleCov.start
-
+  SimpleCov.add_filter "./lib/db/*"
+  SimpleCov.start
+rescue
+  # do nothing
+end
 require 'test/unit'
 #$LOAD_PATH.unshift LIB_DIR
 require "#{LIB_DIR}/fidius-evasiondb"
