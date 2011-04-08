@@ -38,11 +38,22 @@ module FIDIUS
         IdmefEvent.find(event_id)
       end
 
-      # returns a cretain packet
+      # returns a certain packet
       #
       #@param [integer] packet id
       def self.get_packet(pid)
         Packet.find(pid)
+      end
+
+      # returns all exploits for the given service
+      #
+      #@param [integer] port
+      def self.find_exploits_for_service(port)
+        option_set = AttackOption.where(:option_key => "RPORT",
+                                        :option_value => port)
+        exploits = []
+        option_set.each { |opt| exploits << opt.attack_module }
+        exploits
       end
 
       # returns the packets which might be responsible for the given event
@@ -52,13 +63,28 @@ module FIDIUS
         event = IdmefEvent.find(event_id)
         FIDIUS::EvasionDB::LogMatchesHelper.find_packets_for_event(event,Packet.all)
       end
-      
+
+      # find out the events raised by the given payload
+      #
+      #@param [string] payload
+      def self.get_events_for_payload(payload)
+        #TODO: Search all packets which belong to this event
+        events = []
+        search_payload = FIDIUS::EvasionDB::LogMatchesHelper.to_hex(payload)
+        IdmefEvent.find_each do |event|
+          event_payload = FIDIUS::EvasionDB::LogMatchesHelper.to_hex(event.payload)
+          events << event if event_payload.include?(search_payload)
+        end
+
+        events
+      end
+
       # find events for an module(exploit). you can restrict your results by setting options
-      # which sould be used by the exploit. You can even determine if minimal or maximal size of 
+      # which sould be used by the exploit. You can even determine if minimal or maximal size of
       # events should be returned
       #
-      #@param [string] exploit/module name 
-      #@param [hash] options which sould be used
+      #@param [string] exploit/module name
+      #@param [hash] options which should be used
       #@param [integer] MIN_EVENTS||MAX_EVENTS
       def self.find_events_for_exploit(name,options={},result = MIN_EVENTS)
         attacks = AttackModule.find_all_by_name(name).delete_if do |attack|
@@ -92,4 +118,4 @@ module FIDIUS
       end
     end
   end
-end 
+end

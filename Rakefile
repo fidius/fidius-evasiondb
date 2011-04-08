@@ -1,5 +1,7 @@
-require 'bundler'
-Bundler::GemHelper.install_tasks
+unless __FILE__.include? ENV['GEM_HOME']
+  require 'bundler'
+  Bundler::GemHelper.install_tasks
+end
 
 require 'rake/testtask'
 Rake::TestTask.new(:test) do |test|

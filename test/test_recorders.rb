@@ -1,4 +1,4 @@
-require 'helper'
+require_relative 'helper'
 
 module FIDIUS
   module EvasionDB
@@ -24,7 +24,7 @@ class TestRecorders < Test::Unit::TestCase
       "10.0.0.1"
     end
     def localport
-      4446    
+      4446
     end
     def peerhost
       "10.20.20.1"
@@ -63,7 +63,7 @@ class TestRecorders < Test::Unit::TestCase
 
   def test_meterpreter_record
     FIDIUS::EvasionDB::Knowledge::AttackModule.destroy_all
-    
+
     instance = MsfModuleInstanceStub.new
     socket = SocketStub.new
     FIDIUS::EvasionDB.use_recoder "Msf-Recorder"
