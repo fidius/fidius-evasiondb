@@ -1,9 +1,10 @@
-#require 'rubygems'
-#require 'sqlite3'
+require 'rubygems'
+require 'sqlite3'
 
 TEST_DIR = File.dirname(File.expand_path(__FILE__))
 LIB_DIR = File.expand_path(File.join File.dirname(__FILE__),"..","lib") #File.join File.dirname(__FILE__),"..","lib"
 begin
+  require 'simplecov'
   SimpleCov.add_group 'Core', "./lib/evasion-db"
   SimpleCov.add_group 'Knowledge', "./lib/evasion-db/knowledge/*"
   SimpleCov.add_group 'Fetchers', "./lib/evasion-db/idmef-fetchers/*"
@@ -13,6 +14,8 @@ begin
   SimpleCov.start
 rescue
   # do nothing
+  puts "Coverage not possible:#{$!.message}"
+  #raise $!
 end
 require 'test/unit'
 #$LOAD_PATH.unshift LIB_DIR
