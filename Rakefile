@@ -1,4 +1,6 @@
-unless __FILE__.include? ENV['GEM_HOME']
+# fix error: cant convert nil into String
+# Rakefile:1 in include?
+unless ENV['GEM_HOME'] && (__FILE__.include? ENV['GEM_HOME'])
   require 'bundler'
   Bundler::GemHelper.install_tasks
 end
