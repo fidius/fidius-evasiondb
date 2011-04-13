@@ -2,7 +2,6 @@ require_relative 'helper'
 class TestPreludeDB < Test::Unit::TestCase
   def test_prelude_event
     PreludeDBHelper.setup_prelude_db($yml_config["ids_db"])
-    #PreludeDBHelper.delete_all_records
     PreludeDBHelper.insert_event(223,"BadExploit","snort")
 
     p = FIDIUS::PreludeDB::Alert.first
