@@ -16,7 +16,7 @@ Simply install this package with Rubygems:
 
 Then switch to the root directory of your Metasploit installation and run
 
-    $ fidius-evasiondb -e
+    $ fidius-evasiondb -c
 
 Follow the instructions. 
 
