@@ -4,7 +4,6 @@ module FIDIUS
       def config(conf)
         $logger.debug "INIT PRELUDE EVENT FETCHER"
  	      ids_db = conf['ids_db']
-        #FIDIUS::EvasionDB.load_db_adapter(ids_db['adapter'])
         raise "no ids_db part found" unless ids_db
         FIDIUS::PreludeDB::Connection.establish_connection ids_db
         connection = FIDIUS::PreludeDB::Connection.connection
@@ -19,7 +18,6 @@ module FIDIUS
       end
 
       def get_events
-        #raise "no local ip given" if @local_ip == nil
         raise "please begin_record before fetching" if @start_time == nil
         res = Array.new
         sleep 3

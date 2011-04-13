@@ -15,10 +15,8 @@ begin
 rescue
   # do nothing
   puts "Coverage not possible:#{$!.message}"
-  #raise $!
 end
 require 'test/unit'
-#$LOAD_PATH.unshift LIB_DIR
 require "#{LIB_DIR}/fidius-evasiondb"
 require "#{LIB_DIR}/db/db-install"
 require "#{TEST_DIR}/preludedb_helper.rb"

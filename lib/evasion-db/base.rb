@@ -12,30 +12,21 @@ module FIDIUS
     @@current_fetcher = nil
     @@current_recorder = nil
 
-    #def self.load_db_adapter(adapter)
-      #$logger.debug "load adapter #{adapter}"
-      #case adapter
-      #  when 'sqlite3'
-      #    ::Bundler.require(:adapter_sqlite3)
-      #  when 'postgresql'
-      #    ::Bundler.require(:adapter_postgres)
-      #  when 'mysql'
-      #    ::Bundler.require(:adapter_mysql)
-      #  when 'mysql2'
-      #    ::Bundler.require(:adapter_mysql2)
-      #else
-      #  raise "Don't know what gem to use for adapter #{adapter}"
-      #end
-    #end
-
     # Configures EvasionDB. 
     #
     # @param [String] path to an yml-file containing db-connection settings for ids_db and evasion_db
     # sample config can be created with 'fidius-evasiondb -e'
     def self.config(yml_file)
-      raise "#{yml_file} does not exist" unless File.exists? File.expand_path(yml_file)
-      @@yml_config = YAML.load(File.read(yml_file))
-      evasion_db = @@yml_config['evasion_db']
+      if yml_file.class == String
+        raise "#{yml_file} does not exist" unless File.exists? File.expand_path(yml_file)
+        @@yml_config = YAML.load(File.read(yml_file))
+        evasion_db = @@yml_config['evasion_db']
+      elsif yml_file.class == Hash
+        # also react on connection settings given as hash
+        evasion_db = yml_file
+      else
+        raise "please input string or hash"
+      end
       unless evasion_db
         raise "no evasion_db part found in file"
       else
