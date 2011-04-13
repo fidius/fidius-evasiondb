@@ -19,7 +19,7 @@ module FIDIUS
         if module_instance.datastore["RHOSTS"]
           FIDIUS::EvasionDB.current_fetcher.local_ip = FIDIUS::Common.get_my_ip(module_instance.datastore["RHOSTS"])
         end
-        if !@@current_exploit.finished
+        unless @@current_exploit.finished
           $logger.debug("module #{module_instance} finished")
           idmef_events = FIDIUS::EvasionDB.current_fetcher.fetch_events(module_instance)
           $logger.debug("found #{idmef_events.size} events")
@@ -54,7 +54,7 @@ module FIDIUS
           # TODO: what shall we do with meterpreter? 
           # it has not options and no fullname, logger assigns only the string "meterpreter"
           if module_instance.respond_to?("fullname")
-            if !@@current_exploit.finished
+            unless @@current_exploit.finished
               @@current_exploit.packets << FIDIUS::EvasionDB::Knowledge::Packet.create(:payload=>data,:src_addr=>socket.localhost,:src_port=>socket.localport,:dest_addr=>socket.peerhost,:dest_port=>socket.peerport)
               @@current_exploit.save
             end
@@ -73,7 +73,6 @@ module FIDIUS
           $logger.error "error:" # "#{$!.message}" ##{$!.inspect}:#{$!.backtrace}"
         end
       end
-
     end
   end
 end

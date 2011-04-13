@@ -22,7 +22,7 @@ optparse = OptionParser.new do |opts|
 
   opts.banner = "Usage: fidius-evasiondb [options]"
 
-  opts.on_tail("-e", "--empty", "Initialize empty FIDIUS Evasion DB") do
+  opts.on_tail("-c", "--create", "create empty FIDIUS Evasion DB") do
     puts messages['empty']
     if in_msf_root?
       puts "Copy files for MSF-Plugin..."
@@ -45,6 +45,14 @@ optparse = OptionParser.new do |opts|
       puts messages['root']
     end
     exit
+  end
+
+  opts.on_tail("-e", "--export", "export FIDIUS Evasion DB to file ") do
+
+  end
+
+  opts.on_tail("-i", "--import", "import FIDIUS Evasion DB from file") do
+
   end
 
   opts.on_tail("-h", "--help", "Show this message") do
