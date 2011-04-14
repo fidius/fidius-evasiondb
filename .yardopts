@@ -1,0 +1,6 @@
+--title 'EvasionDB'
+--private
+--protected
+--readme 'README.md'
+lib/**/*.rb -
+LICENSE CREDITS.md
