@@ -96,6 +96,7 @@ IDMEF-Events will be fetched from the Prelude-Database and stored to the Knowled
 
 ### Queries
 Sample how the knowledge in EvasionDB can be queried:
+
         ruby-1.9.1-p378 > require 'fidius-evasiondb'
          => true 
         ruby-1.9.1-p378 > FIDIUS::EvasionDB.config "data/database.yml"
