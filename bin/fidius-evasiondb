@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 require 'optparse'
-require 'evasion-db/version'
+require 'fidius-evasiondb'
 require 'fileutils'
 
 GEM_BASE = File.expand_path('../../lib', __FILE__)
