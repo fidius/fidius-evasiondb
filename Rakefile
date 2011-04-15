@@ -11,3 +11,23 @@ Rake::TestTask.new(:test) do |test|
   test.pattern = 'test/**/test_*.rb'
   test.verbose = true
 end
+
+begin
+  require 'yard'
+
+  YARD::Rake::YardocTask.new(:doc) do |t|
+    t.files = ['lib/**/*.rb']
+    exclude = 'lib/db/'
+    static_files = 'LICENSE,CREDITS.md'
+    t.options += [
+      '--title', 'FIDIUS EvasionDB',
+      '--private',   # include private methods
+      '--protected', # include protected methods
+      '--exclude', exclude,
+      '--files', static_files,
+      '--readme', 'README.md'
+    ]
+  end
+rescue LoadError
+  puts 'YARD not installed (gem install yard), http://yardoc.org'
+end
