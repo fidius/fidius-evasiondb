@@ -75,7 +75,7 @@ optparse = OptionParser.new do |opts|
   end
 
   opts.on_tail("-v", "--version", "Show version") do
-    puts "FIDIUS Evasion DB, Version #{Evasion::Db::VERSION}"
+    puts "FIDIUS Evasion DB, Version #{FIDIUS::EvasionDB::VERSION}"
     exit
   end
 end
