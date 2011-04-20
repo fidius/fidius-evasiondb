@@ -17,7 +17,7 @@ begin
 
   YARD::Rake::YardocTask.new(:doc) do |t|
     t.files = ['lib/**/*.rb']
-    exclude = 'lib/db/'
+    exclude = 'lib/db'
     static_files = 'LICENSE,CREDITS.md'
     t.options += [
       '--title', 'FIDIUS EvasionDB',
