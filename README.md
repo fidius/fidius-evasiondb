@@ -25,7 +25,7 @@ This Gem currently uses 2 databases:
 
  * `ids_db`: A Prelude Manager database for fetching IDMEF events.
  * `evasion_db`: Knowledge database for information about exploits and their IDMEF events.
-
+ 
 Please note: The Evasion-DB Gem has only been tested with Linux systems and might not work with Windows.
 
 ## Configuration
@@ -145,6 +145,20 @@ Sample how the knowledge in EvasionDB can be queried:
     => "EXITFUNC" 
     ruby-1.9.1-p378 > m.attack_options.first.option_value
     => "thread" 
+
+## Import and export the database
+
+Run
+
+    $ fidius-evasiondb -e 
+
+in your Metasploit root to dump the database into a directory. It will create a directory named `evasion_db_yyyy-mm-dd-hhmmss` which contains a `schema.rb` file with the table structure and an `evasion_db.yml` file with the database dump.
+
+To import an Evasion DB, simply run
+
+    $ fidius-evasiondb -i dump_dir 
+
+where `dump_dir` is a path to a directory that contains an exported Evasion DB.
 
 ## Authors and Contact
 

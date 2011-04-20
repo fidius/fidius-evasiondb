@@ -61,7 +61,6 @@ optparse = OptionParser.new do |opts|
     if in_msf_root?
       require 'fidius-common'
       dir = FIDIUS::Common::Db.import("data/database.yml", "evasion_db", dir)
-      puts "Import successful"
     else
       puts messages['root']
     end
