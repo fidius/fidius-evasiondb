@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "activerecord", ">= 3.0.0"
   s.add_dependency "activesupport", ">= 3.0.0"
-  s.add_dependency "fidius-common", "~> 0.0.4"
+  s.add_dependency "fidius-common", ">= 0.0.4"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
