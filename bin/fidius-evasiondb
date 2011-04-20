@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 require 'optparse'
-require 'evasion-db/version'
+require 'fidius-evasiondb'
 require 'fileutils'
 
 GEM_BASE = File.expand_path('../../lib', __FILE__)
@@ -47,12 +47,25 @@ optparse = OptionParser.new do |opts|
     exit
   end
 
-  opts.on_tail("-e", "--export", "export FIDIUS Evasion DB to file ") do
-
+  opts.on_tail("-e", "--export", "export FIDIUS Evasion DB to YAML") do
+    if in_msf_root?
+      require 'fidius-common'
+      dir = FIDIUS::Common::Db.export("data/database.yml", "evasion_db")
+      puts "Created dump in '#{dir}'"
+    else
+      puts messages['root']
+    end
   end
 
-  opts.on_tail("-i", "--import", "import FIDIUS Evasion DB from file") do
-
+  opts.on("-i", "--import IMPORT_DIR", "import FIDIUS Evasion DB from YAML") do |dir|
+    if in_msf_root?
+      require 'fidius-common'
+      dir = FIDIUS::Common::Db.import("data/database.yml", "evasion_db", dir)
+      puts "Import successful"
+    else
+      puts messages['root']
+    end
+    dir
   end
 
   opts.on_tail("-h", "--help", "Show this message") do
@@ -62,7 +75,7 @@ optparse = OptionParser.new do |opts|
   end
 
   opts.on_tail("-v", "--version", "Show version") do
-    puts "FIDIUS Evasion DB, Version #{Evasion::Db::VERSION}"
+    puts "FIDIUS Evasion DB, Version #{FIDIUS::EvasionDB::VERSION}"
     exit
   end
 end

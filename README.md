@@ -40,7 +40,7 @@ It has been tested with PostgreSQL and MySQL databases but should work for other
 
 There are two possibilities to use this Gem, either inside the Metasploit console (with a plugin) or
 from external scripts by requiring the Gem. The first method (use in `msfconsole`) is intended to
-generate knowledge about exploits. You can execute any module withhin metasploit and log
+generate knowledge about exploits. You can execute any module within metasploit and log
 corresponding IDMEF events. 
 
 Please note: Currently it is only possible to fetch IDMEF events from an existing and configured
@@ -48,7 +48,7 @@ Prelude Manager database. At the beginning of a module execution, the timestamp 
 events in prelude are measured. After the module is finished newly generated events are identified
 via timestamp and the attackers source IP address.
 
-### In `msfconsole`
+### In MSF console
 
 Example for monitoring an exploit. After loading the plugin all modules which are executed by
 metasploit will be monitored. All payload which is send to the target will be stored in the
@@ -92,10 +92,16 @@ from the Prelude database and stored to the Knowledge database, too.
     $ (11)NETBIOS SMB-DS IPC$ share access with 72 bytes payload
     $ msf exploit(ms08_067_netapi) > 
 
-### From external script
+### From external scripts or IRb
 
-* Require the gem, call `connect_db`.
-* Only queries are possible.
+From external scripts or inside IRb, there are only queries to the Evasion DB possible.
+The usage is quite simple.
+
+Just `require 'fidius-evasion'` in your script and call 
+
+    FIDIUS::EvasionDB.config 'path/to/your/database.yml'
+
+This will connect to the database and give you the possibility to use one of the query methods below. 
 
 ### Queries
 
