@@ -99,4 +99,27 @@ class TestKnowledge < Test::Unit::TestCase
     assert_equal 1,events.size
 
   end
+
+  def test_rule_models
+    IdsRule.create(:rule_text=>"Wurst1")
+    IdsRule.create(:rule_text=>"Wurst2")
+
+    e = EnabledRules.create(:bitstring=>"00101")
+    e.attack_module = FIDIUS::EvasionDB::Knowledge::AttackModule.first
+    e.save
+  end
+
+  def test_ids_rule_helpers
+    IdsRule.create_if_not_exists("wurst")
+    IdsRule.create_if_not_exists("brot")
+    IdsRule.create_if_not_exists("hans")
+    IdsRule.create_if_not_exists("hans")
+
+    assert_equal 3, IdsRule.all.size
+
+    assert_equal 0, IdsRule.find_by_rule_text("wurst").sort
+    assert_equal 1, IdsRule.find_by_rule_text("brot").sort
+    assert_equal 2, IdsRule.find_by_rule_text("hans").sort
+  end
+
 end

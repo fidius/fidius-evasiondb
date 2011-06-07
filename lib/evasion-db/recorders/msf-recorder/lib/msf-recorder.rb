@@ -6,7 +6,11 @@ module FIDIUS
     # @see {file:msf-plugins/evasiondb.rb}
     module MsfRecorder
       def module_started(module_instance)
+        # use rule_fetcher if the module starts
         @@current_exploit = FIDIUS::EvasionDB::Knowledge::AttackModule.find_or_create_by_name_and_options(module_instance.fullname,module_instance.datastore)
+        if FIDIUS::EvasionDB.current_rule_fetcher
+          FIDIUS::EvasionDB.current_rule_fetcher.fetch_rules(@@current_exploit)
+        end
         FIDIUS::EvasionDB.current_fetcher.begin_record
       end
 

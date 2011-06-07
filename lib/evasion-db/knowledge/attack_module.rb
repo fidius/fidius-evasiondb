@@ -7,6 +7,7 @@ module FIDIUS::EvasionDB::Knowledge
     has_many :packets, :dependent=>:destroy
     has_many :attack_options, :dependent=>:destroy
     has_one :attack_payload, :dependent=>:destroy
+    has_one :enabled_rules
 
     def self.table_name
       "attack_modules"

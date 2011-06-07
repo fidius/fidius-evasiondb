@@ -16,6 +16,8 @@ module FIDIUS
       autoload :Connection,    'evasion-db/knowledge/connection'
       autoload :IdmefEvent,    'evasion-db/knowledge/idmef_event'
       autoload :Packet,        'evasion-db/knowledge/packet'
+      autoload :IdsRule,       'evasion-db/knowledge/ids_rule'
+      autoload :EnabledRules,  'evasion-db/knowledge/enabled_rules'
 
       # returns all modules(exploits) in knowledge database
       def self.get_exploits
