@@ -110,10 +110,10 @@ class TestKnowledge < Test::Unit::TestCase
   end
 
   def test_ids_rule_helpers
-    IdsRule.create_if_not_exists("wurst")
-    IdsRule.create_if_not_exists("brot")
-    IdsRule.create_if_not_exists("hans")
-    IdsRule.create_if_not_exists("hans")
+    IdsRule.create_if_not_exists("wurst",0)
+    IdsRule.create_if_not_exists("brot",1)
+    IdsRule.create_if_not_exists("hans",2)
+    IdsRule.create_if_not_exists("hans",2)
 
     assert_equal 3, IdsRule.all.size
 

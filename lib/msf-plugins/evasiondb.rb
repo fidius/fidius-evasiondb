@@ -221,6 +221,8 @@ class Plugin::EvasionDB < Msf::Plugin
     FIDIUS::EvasionDB.config(dbconfig_path)
     FIDIUS::EvasionDB.use_recoder "Msf-Recorder"
     FIDIUS::EvasionDB.use_fetcher "PreludeDB"
+    FIDIUS::EvasionDB.use_rule_fetcher "Snortrule-Fetcher"
+    FIDIUS::EvasionDB::SnortRuleFetcher.ssh_options = {:auth_methods=>["password"],:msfmodule=>FIDIUS::MsfModuleStub}
 
     add_console_dispatcher(ConsoleCommandDispatcher)
     framework.events.add_general_subscriber(FIDIUS::ModuleRunCallback.new)
@@ -376,3 +378,13 @@ module SocketTracer
   end
 end #SocketTracer
 end #FIDIUS
+
+module FIDIUS
+class MsfModuleStub
+  # do nothing to prevent metasploits lib/net/ssh.rb from dieing
+  def self.add_socket(a)
+  end
+  def self.remove_socket(a)
+  end
+end
+end

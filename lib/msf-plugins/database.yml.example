@@ -31,4 +31,4 @@ snort-fetcher:
   ssh_host: 10.10.10.254
   ssh_pw: fidius09
   ssh_remote_path: /etc/snort/rules/
-  ssh_user: fidius
+  ssh_user: root

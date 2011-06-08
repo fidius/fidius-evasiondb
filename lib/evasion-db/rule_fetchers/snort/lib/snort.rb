@@ -13,23 +13,53 @@ module FIDIUS
       @@ssh_remote_path = nil
       @@ssh_user = nil
       @@fetch_remote = false
+      @@ssh_options = {}
 
       def fetch_rules(attack_module)
         raise "no rulepath given" unless @@rule_path
         puts "snort rule fetcher"
-        download_rules if @@fetch_remote
 
-        Snortor.import_rules(@@rule_path)
+        if @@fetch_remote
+          a = {:host=>@@ssh_host,:user=>@@ssh_user,:password=>@@ssh_pw,:remote_path=>@@ssh_remote_path,:options=>@@ssh_options}
+          puts "Snortor.import_rules(#{a.inspect})"
+          Snortor.import_rules(a)
+        else
+          Snortor.import_rules(@@rule_path)
+        end
+
+        start_time = Time.now
+        puts "rules exported save to db now"
         rules_enabled = BitField.new(Snortor.rules.size)
         i = 0
+
+        insert_query = []
+
+        #rules = []
+        #rules << Snortor.rules[0]
+        #rules << Snortor.rules[1]
+        #rules << Snortor.rules[2]
+        
         Snortor.rules.each do |rule|
           if rule.message
-            FIDIUS::EvasionDB::Knowledge::IdsRule.exists?(rule.message)
-            rules_enabled[i] = rule.active
+            #FIDIUS::EvasionDB::Knowledge::IdsRule.create_if_not_exists(rule.message,i)
+            insert_query << FIDIUS::EvasionDB::Knowledge::IdsRule.sub_query_for_insert(rule.message,i)
+            rules_enabled[i] = (rule.active == true)? 1 : 0
             i += 1
           end
         end
+        begin
+          FIDIUS::EvasionDB::Knowledge::IdsRule.connection.execute("INSERT IGNORE INTO ids_rules (rule_text,rule_hash,sort) VALUES #{insert_query.join(',')};")
+        rescue
+          begin
+            # try without IGNORE statement
+            FIDIUS::EvasionDB::Knowledge::IdsRule.connection.execute("INSERT INTO ids_rules (rule_text,rule_hash,sort) VALUES #{insert_query.join(',')};")
+          rescue
+            puts $!.message+":"+$!.backtrace.to_s
+          end
+        end
+        end_time = Time.now
 
+        puts "rules stored to db. #{end_time-start_time} seconds needed"
         ruleset = FIDIUS::EvasionDB::Knowledge::EnabledRules.create(:bitstring=>rules_enabled.to_s)
         ruleset.attack_module = attack_module
         ruleset.save
@@ -49,19 +79,8 @@ module FIDIUS
         @@fetch_remote = @@ssh_host != nil
       end
 
-
-      def download_rules
-        require 'net/ssh'
-        require 'net/scp'
-        #Net::SCP.download!("10.10.10.254", "root",
-        #  "/etc/snort/rules/x11.rules", "/home/bernd/fidius/snortor/x11.rules",
-        #  :password => "fidius09")
-        puts "try to download rules from #{@@ssh_host}:#{@@ssh_remote_path}"
-        Dir.mkdir(@@rule_path) if !File.exists?(@@rule_path)
-        Net::SSH.start(@@ssh_host, @@ssh_user, :password => @@ssh_pw) do |ssh|
-          ssh.scp.download! @@ssh_remote_path, @@rule_path,:recursive=>true
-          #ssh.scp.upload! "/home/bernd/fidius/snortor/rules/rules/x11.rules", "/root/x11.rules"
-        end
+      def self.ssh_options=(a)
+        @@ssh_options = a
       end
     end
   end
