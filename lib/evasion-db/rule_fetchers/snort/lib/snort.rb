@@ -3,10 +3,13 @@ begin
 rescue
   raise "can not find snortor gem. Please gem install snortor"
 end
+require 'evasion-db/vendor/bitfield'
+
 module FIDIUS
   module EvasionDB
     module SnortRuleFetcher
       @@rule_path = nil
+
 
       @@ssh_host = nil
       @@ssh_pw = nil
@@ -15,10 +18,8 @@ module FIDIUS
       @@fetch_remote = false
       @@ssh_options = {}
 
-      def fetch_rules(attack_module)
+      def import_rules_to_snortor
         raise "no rulepath given" unless @@rule_path
-        puts "snort rule fetcher"
-
         if @@fetch_remote
           a = {:host=>@@ssh_host,:user=>@@ssh_user,:password=>@@ssh_pw,:remote_path=>@@ssh_remote_path,:options=>@@ssh_options}
           puts "Snortor.import_rules(#{a.inspect})"
@@ -26,24 +27,45 @@ module FIDIUS
         else
           Snortor.import_rules(@@rule_path)
         end
+      end
+
+      # generate a bitvector based on activated rules
+      # and assign this bisvector to the given attack_module
+      def fetch_rules(attack_module)
+        import_rules_to_snortor
+
+        raise "this attack_module has an ruleset bitvector" if attack_module.enabled_rules
+
+        start_time = Time.now
+        rules_enabled = BitField.new(Snortor.rules.size)
+        i = 0
+        Snortor.rules.each do |rule|
+          if rule.message
+            rules_enabled[i] = (rule.active == true)? 1 : 0
+            i += 1
+          end
+        end
+        end_time = Time.now
+
+        ruleset = FIDIUS::EvasionDB::Knowledge::EnabledRules.create(:bitstring=>rules_enabled.to_s)
+        ruleset.attack_module = attack_module
+        ruleset.save
+      end
+
+      # fetches rules with snortor 
+      # and stores them all into db
+      def import_rules
+        raise "rules imported already" if FIDIUS::EvasionDB::Knowledge::IdsRule.all.size > 0
+        import_rules_to_snortor
 
         start_time = Time.now
         puts "rules exported save to db now"
-        rules_enabled = BitField.new(Snortor.rules.size)
+
         i = 0
-
         insert_query = []
-
-        #rules = []
-        #rules << Snortor.rules[0]
-        #rules << Snortor.rules[1]
-        #rules << Snortor.rules[2]
-        
         Snortor.rules.each do |rule|
           if rule.message
-            #FIDIUS::EvasionDB::Knowledge::IdsRule.create_if_not_exists(rule.message,i)
             insert_query << FIDIUS::EvasionDB::Knowledge::IdsRule.sub_query_for_insert(rule.message,i)
-            rules_enabled[i] = (rule.active == true)? 1 : 0
             i += 1
           end
         end
@@ -58,11 +80,7 @@ module FIDIUS
           end
         end
         end_time = Time.now
-
-        puts "rules stored to db. #{end_time-start_time} seconds needed"
-        ruleset = FIDIUS::EvasionDB::Knowledge::EnabledRules.create(:bitstring=>rules_enabled.to_s)
-        ruleset.attack_module = attack_module
-        ruleset.save
+        puts "Import needed #{end_time-start_time} seconds"
       end
 
       def config(conf)
