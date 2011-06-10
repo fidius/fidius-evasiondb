@@ -21,8 +21,8 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = ""
 
-  s.add_dependency "activerecord", ">= 3.0.0"
-  s.add_dependency "activesupport", ">= 3.0.0"
+  s.add_dependency "activerecord" #, ">= 3.0.0"
+  s.add_dependency "activesupport" #, ">= 3.0.0"
   s.add_dependency "fidius-common", "~> 0.0.4"
   s.add_dependency "snortor", "~> 0.0.1"
 

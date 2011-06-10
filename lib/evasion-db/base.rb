@@ -33,6 +33,7 @@ module FIDIUS
       else
         #self.load_db_adapter(evasion_db['adapter'])
         FIDIUS::EvasionDB::Knowledge::Connection.establish_connection evasion_db
+        #require File.join(GEM_BASE, 'evasion-db', 'postgres_patch.rb')
         FIDIUS::EvasionDB::Knowledge::Connection.connection
       end
     end

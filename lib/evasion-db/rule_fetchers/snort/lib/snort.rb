@@ -3,7 +3,8 @@ begin
 rescue
   raise "can not find snortor gem. Please gem install snortor"
 end
-require 'evasion-db/vendor/bitfield'
+#require 'evasion-db/vendor/bitfield'
+require File.join(FIDIUS::EvasionDB::GEM_BASE, 'evasion-db', 'vendor', 'bitfield')
 
 module FIDIUS
   module EvasionDB
@@ -28,7 +29,6 @@ module FIDIUS
           Snortor.import_rules(@@rule_path)
         end
       end
-
       # generate a bitvector based on activated rules
       # and assign this bisvector to the given attack_module
       def fetch_rules(attack_module)

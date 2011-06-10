@@ -10,14 +10,14 @@ module FIDIUS
       # to indicate that the exploit with maximal events should be searched
       MAX_EVENTS = 2
 
-      autoload :AttackModule,  'evasion-db/knowledge/attack_module'
-      autoload :AttackOption,  'evasion-db/knowledge/attack_option'
-      autoload :AttackPayload, 'evasion-db/knowledge/attack_payload'
-      autoload :Connection,    'evasion-db/knowledge/connection'
-      autoload :IdmefEvent,    'evasion-db/knowledge/idmef_event'
-      autoload :Packet,        'evasion-db/knowledge/packet'
-      autoload :IdsRule,       'evasion-db/knowledge/ids_rule'
-      autoload :EnabledRules,  'evasion-db/knowledge/enabled_rules'
+      autoload :AttackModule,  "#{GEM_BASE}/evasion-db/knowledge/attack_module"
+      autoload :AttackOption,  "#{GEM_BASE}/evasion-db/knowledge/attack_option"
+      autoload :AttackPayload, "#{GEM_BASE}/evasion-db/knowledge/attack_payload"
+      autoload :Connection,    "#{GEM_BASE}/evasion-db/knowledge/connection"
+      autoload :IdmefEvent,    "#{GEM_BASE}/evasion-db/knowledge/idmef_event"
+      autoload :Packet,        "#{GEM_BASE}/evasion-db/knowledge/packet"
+      autoload :IdsRule,       "#{GEM_BASE}/evasion-db/knowledge/ids_rule"
+      autoload :EnabledRules,  "#{GEM_BASE}/evasion-db/knowledge/enabled_rules"
 
       # returns all modules(exploits) in knowledge database
       def self.get_exploits
