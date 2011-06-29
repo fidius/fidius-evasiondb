@@ -23,7 +23,6 @@
 #              More
 #                bf.to_s = "10101000101010101"  (example)
 #                bf.total_set         .. => 10  (example - 10 bits are set to "1")
-
 class BitField
   attr_reader :size
   include Enumerable

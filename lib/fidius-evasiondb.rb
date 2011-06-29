@@ -12,9 +12,10 @@ module FIDIUS
     GEM_BASE      = File.expand_path('..', __FILE__)
     $logger.debug "GEM_BASE ist: #{GEM_BASE}"
     
-    autoload :VERSION,          'evasion-db/version'
-    autoload :LogMatchesHelper, 'evasion-db/log_matches_helper'
-    autoload :Knowledge,        'evasion-db/knowledge'
+    autoload :VERSION,          "#{GEM_BASE}/evasion-db/version"
+    autoload :LogMatchesHelper, "#{GEM_BASE}/evasion-db/log_matches_helper"
+    autoload :Knowledge,        "#{GEM_BASE}/evasion-db/knowledge"
+    autoload :BitField,         "#{GEM_BASE}/evasion-db/vendor/bitfield"
 
     # install fetchers
     require File.join(GEM_BASE, 'evasion-db', 'idmef-fetchers', 'fetchers.rb')
@@ -23,5 +24,9 @@ module FIDIUS
     # install recorders
     require File.join(GEM_BASE, 'evasion-db', 'recorders', 'recorders.rb')
     FIDIUS::EvasionDB.install_recorders
+
+    # install rule_recorder
+    require File.join(GEM_BASE, 'evasion-db', 'rule_fetchers', 'rule_fetchers.rb')
+    FIDIUS::EvasionDB.install_rule_fetchers
   end
 end
