@@ -11,6 +11,7 @@ module FIDIUS
     @@yml_config = nil
     @@current_fetcher = nil
     @@current_recorder = nil
+    @@current_rule_fetcher = nil
 
     # Configures EvasionDB. 
     #
@@ -32,6 +33,7 @@ module FIDIUS
       else
         #self.load_db_adapter(evasion_db['adapter'])
         FIDIUS::EvasionDB::Knowledge::Connection.establish_connection evasion_db
+        #require File.join(GEM_BASE, 'evasion-db', 'postgres_patch.rb')
         FIDIUS::EvasionDB::Knowledge::Connection.connection
       end
     end
@@ -55,8 +57,20 @@ module FIDIUS
     def self.use_fetcher(fetcher_name)
       raise "not configured. use FIDIUS::EvasionDB.config first" unless @@yml_config
       @@current_fetcher = Fetcher.by_name(fetcher_name)
+      raise "fetcher #{fetcher_name} not found" unless @@current_fetcher    
       @@current_fetcher.config(@@yml_config)
-      raise "fetcher #{recorder_name} not found" unless @@current_fetcher    
+    end
+
+    # Use a given rule-fetcher. RuleFetchers are used to fetch rules from an rule based ids.
+    # Currently there is only the Fetcher for a Snort IDS. 
+    #
+    # @param [String] rule_fetcher_name
+    # @raise RuntimeError if fetcher not found
+    def self.use_rule_fetcher(rule_fetcher_name)
+      raise "not configured. use FIDIUS::EvasionDB.config first" unless @@yml_config
+      @@current_rule_fetcher = RuleFetcher.by_name(rule_fetcher_name)
+      raise "rule-fetcher #{rule_fetcher_name} not found" unless @@current_rule_fetcher    
+      @@current_rule_fetcher.config(@@yml_config)
     end
 
     # Returns the current recorder
@@ -75,6 +89,14 @@ module FIDIUS
     def self.current_fetcher
       raise "no fetcher set. Use FIDIUS::EvasionDB.use_fetcher" unless @@current_fetcher
       @@current_fetcher
+    end
+
+
+    # Returns the current rule fetcher
+    #
+    # @see #use_rule_fetcher
+    def self.current_rule_fetcher
+      @@current_rule_fetcher
     end
   end# module EvasionDB
 end# module FIDIUS
