@@ -58,7 +58,7 @@ module FIDIUS
       def self.find_exploits_for_services(ports_list)
         exploits = []
         ports_list.each { |port| exploits.concat(find_exploits_for_service(port)) }
-        exploits
+        exploits.map { |e| e.id }
       end
 
       # returns all exploits for the given service
