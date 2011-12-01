@@ -3,7 +3,7 @@ begin
 rescue
   raise "can not find snortor gem. Please gem install snortor"
 end
-#require 'evasion-db/vendor/bitfield'
+
 require File.join(FIDIUS::EvasionDB::GEM_BASE, 'evasion-db', 'vendor', 'bitfield')
 
 module FIDIUS
@@ -52,14 +52,11 @@ module FIDIUS
         ruleset.save
       end
 
-      # fetches rules with snortor 
+      # fetches rules with snortor
       # and stores them all into db
       def import_rules
         raise "rules imported already" if FIDIUS::EvasionDB::Knowledge::IdsRule.all.size > 0
         import_rules_to_snortor
-
-        start_time = Time.now
-        puts "rules exported save to db now"
 
         i = 0
         insert_query = []
@@ -79,8 +76,6 @@ module FIDIUS
             puts $!.message+":"+$!.backtrace.to_s
           end
         end
-        end_time = Time.now
-        puts "Import needed #{end_time-start_time} seconds"
       end
 
       def config(conf)

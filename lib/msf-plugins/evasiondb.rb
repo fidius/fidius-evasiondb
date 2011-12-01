@@ -52,7 +52,7 @@ class Plugin::EvasionDB < Msf::Plugin
 		snl = false
 		lst = 0
     rclosed = true
-		while (idx < str.length)      
+		while (idx < str.length)
 			chunk = str[idx, width]
 			line  = chunk.unpack("H*")[0].scan(/../).join(" ")
       if from >= idx && from < idx+width
@@ -184,7 +184,7 @@ class Plugin::EvasionDB < Msf::Plugin
     def cmd_show_packet(*args)
       raise "please provide packet_id" if args.size != 1
       packet = FIDIUS::EvasionDB::Knowledge::Packet.find(args[0].to_i)
-      
+
       hex = to_hex_dump(packet.payload)
       print_line hex
     end
@@ -203,7 +203,7 @@ class Plugin::EvasionDB < Msf::Plugin
         print_line "#{packet[:packet].payload.size} bytes"
         print_line "match #{packet[:index]} - #{packet[:index]+packet[:length]-1}"
         hex = to_hex_dump(packet[:packet].payload,packet[:index],packet[:index]+packet[:length]-1)
-        print_line hex      
+        print_line hex
       else
         print_line "no packets available"
       end
@@ -213,7 +213,6 @@ class Plugin::EvasionDB < Msf::Plugin
     end
 
     def cmd_fetch_events(*args)
-      #events = FIDIUS::EvasionDB::Knowledge.fetch_events
       FIDIUS::EvasionDB.current_fetcher.local_ip = nil
       events = FIDIUS::EvasionDB.current_fetcher.fetch_events
       if events
@@ -286,7 +285,7 @@ class PacketLogger
   end
 
   def self.inspect_socket(socket)
-    "#{socket.localhost}:#{socket.localport} -> #{socket.peerhost}:#{socket.peerport}"    
+    "#{socket.localhost}:#{socket.localport} -> #{socket.peerhost}:#{socket.peerport}"
   end
 
   class MySocketEventHandler
@@ -339,7 +338,7 @@ end #class ModuleRunCallback
 end #FIDIUS
 
 # This extends the PacketDispatcher from Rex
-# with Logging 
+# with Logging
 # Original Source is: lib/rex/post/meterpreter/packet_dispatcher.rb
 module Rex::Post::Meterpreter::PacketDispatcher
   def send_packet(packet, completion_routine = nil, completion_param = nil)
@@ -362,7 +361,7 @@ module Rex::Post::Meterpreter::PacketDispatcher
         @finish = true
 
         # Reraise the error to the top-level caller
-        raise e		
+        raise e
       end
     end
 

@@ -27,13 +27,6 @@ module FIDIUS::EvasionDB::Knowledge
         rescue
           puts $!.message
         end
-        # try again without ignore maybe our database does not support ignore
-        #SQLite3::SQLException: near "IGNORE"
-        #h = Digest::MD5.hexdigest(text)
-        #rule = self.find_or_create_by_rule_hash(h)
-        #rule.rule_text=text
-        #rule.sort = sort
-        #rule.save
       end
     end
   end
