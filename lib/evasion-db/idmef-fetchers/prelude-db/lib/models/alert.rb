@@ -12,11 +12,12 @@ module FIDIUS
       has_one :analyzer, :class_name => 'Analyzer', :foreign_key => :_message_ident, :primary_key => :_ident
       has_one :impact, :class_name => 'Impact', :foreign_key => :_message_ident, :primary_key => :_ident
       has_one :payload, :class_name => 'AdditionalData', :foreign_key => :_message_ident, :primary_key => :_ident, :conditions=>["Prelude_AdditionalData.meaning='payload'"]
-      set_primary_key :_ident
 
-      def self.table_name
-        "Prelude_Alert"
-      end
+      set_primary_key :_ident
+      set_table_name "Prelude_Alert"
+      #def self.table_name
+      #  "Prelude_Alert"
+      #end
 
       def self.total_entries
         sql = connection();

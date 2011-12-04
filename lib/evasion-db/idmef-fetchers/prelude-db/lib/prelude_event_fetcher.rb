@@ -12,9 +12,8 @@ module FIDIUS
       end
 
       def begin_record
-        a = FIDIUS::PreludeDB::Alert.find(:first,:joins => [:detect_time],:order=>"time DESC")
-        last_event = FIDIUS::PreludeDB::PreludeEvent.new(a)
-        @start_time = last_event.detect_time
+        t = FIDIUS::PreludeDB::DetectTime.find(:first,:order=>"time DESC")
+        @start_time = t.time
       end
 
       def get_events
@@ -22,7 +21,14 @@ module FIDIUS
         res = Array.new
         sleep 3
         $logger.debug "alert.find(:all,:joins=>[:detect_time],time > #{@start_time})"
-        events = FIDIUS::PreludeDB::Alert.find(:all,:joins => [:detect_time],:order=>"time DESC",:conditions=>["time > :d",{:d => @start_time}])
+
+        detect_times = FIDIUS::PreludeDB::DetectTime.find(:all,:order=>"time DESC",:conditions=>["time > :d",{:d => @start_time}])
+        events = []
+        detect_times.each do |dt|
+          events << FIDIUS::PreludeDB::Alert.find(:first,:conditions=>{:_ident=>dt._message_ident})
+        end
+        ################################################
+
         $logger.debug "found #{events.size} events"
         events.each do |event|
           ev = FIDIUS::PreludeDB::PreludeEvent.new(event)
@@ -30,7 +36,7 @@ module FIDIUS
           if @local_ip
             if (ev.source_ip == @local_ip || ev.dest_ip == @local_ip)
               $logger.debug "adding #{ev.inspect} to events "
-              res << ev  
+              res << ev
             end
           else
             $logger.debug "adding #{ev.inspect} to events "
@@ -64,4 +70,3 @@ Dir.glob(File.join File.dirname(__FILE__), 'models', '*.rb') do |rb|
   $logger.debug "loading #{rb}"
   require rb
 end
-

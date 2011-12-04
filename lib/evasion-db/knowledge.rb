@@ -10,12 +10,14 @@ module FIDIUS
       # to indicate that the exploit with maximal events should be searched
       MAX_EVENTS = 2
 
-      autoload :AttackModule,  'evasion-db/knowledge/attack_module'
-      autoload :AttackOption,  'evasion-db/knowledge/attack_option'
-      autoload :AttackPayload, 'evasion-db/knowledge/attack_payload'
-      autoload :Connection,    'evasion-db/knowledge/connection'
-      autoload :IdmefEvent,    'evasion-db/knowledge/idmef_event'
-      autoload :Packet,        'evasion-db/knowledge/packet'
+      autoload :AttackModule,  "#{GEM_BASE}/evasion-db/knowledge/attack_module"
+      autoload :AttackOption,  "#{GEM_BASE}/evasion-db/knowledge/attack_option"
+      autoload :AttackPayload, "#{GEM_BASE}/evasion-db/knowledge/attack_payload"
+      autoload :Connection,    "#{GEM_BASE}/evasion-db/knowledge/connection"
+      autoload :IdmefEvent,    "#{GEM_BASE}/evasion-db/knowledge/idmef_event"
+      autoload :Packet,        "#{GEM_BASE}/evasion-db/knowledge/packet"
+      autoload :IdsRule,       "#{GEM_BASE}/evasion-db/knowledge/ids_rule"
+      autoload :EnabledRules,  "#{GEM_BASE}/evasion-db/knowledge/enabled_rules"
 
       # returns all modules(exploits) in knowledge database
       def self.get_exploits
@@ -50,6 +52,15 @@ module FIDIUS
       #@param [integer] packet id
       def self.get_packet(pid)
         Packet.find(pid)
+      end
+
+      # returns all exploits for the given services
+      #
+      #@param [array] ports_list
+      def self.find_exploits_for_services(ports_list)
+        exploits = []
+        ports_list.each { |port| exploits.concat(find_exploits_for_service(port)) }
+        exploits.map { |e| e.id }
       end
 
       # returns all exploits for the given service

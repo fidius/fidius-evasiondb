@@ -22,3 +22,13 @@ evasion_db:
   username: root
   password:
   socket: /opt/lampp/var/mysql/mysql.sock
+
+snort-fetcher:
+  # path with *.rules files 
+  rule_path: /home/bernd/fidius/snort/rules/fetched
+  # optional ssh credentials
+  # content of folder remote_path will be copied via ssh tu rule_path
+  ssh_host: 10.10.10.254
+  ssh_pw: fidius09
+  ssh_remote_path: /etc/snort/rules/
+  ssh_user: root

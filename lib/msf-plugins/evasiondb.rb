@@ -34,7 +34,9 @@ class Plugin::EvasionDB < Msf::Plugin
         "send_event_payload" => "send a given payload of an idmef-event to generate false positive",
         "config_exploit" => "configures an exploit with the options of a previous runtime",
         "delete_events" => "deletes events from knowledge",
-        "set_autologging" => "true|false automatically log all executed modules"
+        "set_autologging" => "true|false automatically log all executed modules",
+        "import_rules" => "import rules based on your config (this could take some time)",
+        "assign_rules_to_attack" => "assigns bitvector of activated rules to the given attack"
       }
     end
 
@@ -50,7 +52,7 @@ class Plugin::EvasionDB < Msf::Plugin
 		snl = false
 		lst = 0
     rclosed = true
-		while (idx < str.length)      
+		while (idx < str.length)
 			chunk = str[idx, width]
 			line  = chunk.unpack("H*")[0].scan(/../).join(" ")
       if from >= idx && from < idx+width
@@ -113,6 +115,17 @@ class Plugin::EvasionDB < Msf::Plugin
       end
     end
 
+    def cmd_import_rules(*args)
+      FIDIUS::EvasionDB.current_rule_fetcher.import_rules
+    end
+
+    def cmd_assign_rules_to_attack(*args)
+      raise "please provide an attack module id" if args.size != 1
+      a = FIDIUS::EvasionDB::Knowledge::AttackModule.find(args[0].to_i)
+      FIDIUS::EvasionDB.current_rule_fetcher.fetch_rules(a)
+    end
+
+
     def cmd_send_packet(*args)
       raise "please provide packet id" if args.size != 1
       packet = FIDIUS::EvasionDB::Knowledge.get_packet(args[0].to_i)
@@ -134,6 +147,14 @@ class Plugin::EvasionDB < Msf::Plugin
         print_line "-"*60
         print_line "#{events.size} idmef-events fetched"
         print_line "-"*60
+
+        if exploit.enabled_rules
+          print_line "-"*60
+          all = exploit.enabled_rules.count(:all)
+          active = exploit.enabled_rules.count(:active)
+          print_line "Rules: #{active}/#{all}"
+          print_line "-"*60
+        end
         events.each do |event|
           print_line "(#{event.id})#{event.text} with #{event.payload_size} bytes payload"
         end
@@ -163,7 +184,7 @@ class Plugin::EvasionDB < Msf::Plugin
     def cmd_show_packet(*args)
       raise "please provide packet_id" if args.size != 1
       packet = FIDIUS::EvasionDB::Knowledge::Packet.find(args[0].to_i)
-      
+
       hex = to_hex_dump(packet.payload)
       print_line hex
     end
@@ -182,7 +203,7 @@ class Plugin::EvasionDB < Msf::Plugin
         print_line "#{packet[:packet].payload.size} bytes"
         print_line "match #{packet[:index]} - #{packet[:index]+packet[:length]-1}"
         hex = to_hex_dump(packet[:packet].payload,packet[:index],packet[:index]+packet[:length]-1)
-        print_line hex      
+        print_line hex
       else
         print_line "no packets available"
       end
@@ -192,7 +213,6 @@ class Plugin::EvasionDB < Msf::Plugin
     end
 
     def cmd_fetch_events(*args)
-      #events = FIDIUS::EvasionDB::Knowledge.fetch_events
       FIDIUS::EvasionDB.current_fetcher.local_ip = nil
       events = FIDIUS::EvasionDB.current_fetcher.fetch_events
       if events
@@ -221,6 +241,8 @@ class Plugin::EvasionDB < Msf::Plugin
     FIDIUS::EvasionDB.config(dbconfig_path)
     FIDIUS::EvasionDB.use_recoder "Msf-Recorder"
     FIDIUS::EvasionDB.use_fetcher "PreludeDB"
+    FIDIUS::EvasionDB.use_rule_fetcher "Snortrule-Fetcher"
+    FIDIUS::EvasionDB::SnortRuleFetcher.ssh_options = {:auth_methods=>["password"],:msfmodule=>FIDIUS::MsfModuleStub}
 
     add_console_dispatcher(ConsoleCommandDispatcher)
     framework.events.add_general_subscriber(FIDIUS::ModuleRunCallback.new)
@@ -263,7 +285,7 @@ class PacketLogger
   end
 
   def self.inspect_socket(socket)
-    "#{socket.localhost}:#{socket.localport} -> #{socket.peerhost}:#{socket.peerport}"    
+    "#{socket.localhost}:#{socket.localport} -> #{socket.peerhost}:#{socket.peerport}"
   end
 
   class MySocketEventHandler
@@ -316,7 +338,7 @@ end #class ModuleRunCallback
 end #FIDIUS
 
 # This extends the PacketDispatcher from Rex
-# with Logging 
+# with Logging
 # Original Source is: lib/rex/post/meterpreter/packet_dispatcher.rb
 module Rex::Post::Meterpreter::PacketDispatcher
   def send_packet(packet, completion_routine = nil, completion_param = nil)
@@ -339,7 +361,7 @@ module Rex::Post::Meterpreter::PacketDispatcher
         @finish = true
 
         # Reraise the error to the top-level caller
-        raise e		
+        raise e
       end
     end
 
@@ -376,3 +398,13 @@ module SocketTracer
   end
 end #SocketTracer
 end #FIDIUS
+
+module FIDIUS
+class MsfModuleStub
+  # do nothing to prevent metasploits lib/net/ssh.rb from dieing
+  def self.add_socket(a)
+  end
+  def self.remove_socket(a)
+  end
+end
+end

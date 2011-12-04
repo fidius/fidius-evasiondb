@@ -21,17 +21,22 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = ""
 
-  s.add_dependency "activerecord", ">= 3.0.0"
-  s.add_dependency "activesupport", ">= 3.0.0"
-  s.add_dependency "fidius-common", ">= 0.0.4"
+  s.add_dependency "activerecord" #, ">= 3.0.0"
+  s.add_dependency "activesupport" #, ">= 3.0.0"
+  s.add_dependency "fidius-common", "~> 0.0.4"
+  s.add_dependency "snortor", "~> 0.0.1"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
   
-  s.rdoc_options << '--title' << s.name <<
-                    '--main'  << 'README.md' << '--show-hash' <<
-                    `git ls-files -- lib/*`.split("\n") <<
-                    'README.md' << 'LICENSE' << 'CREDITS.md'
+  # TODO: this raises error ERROR:  While executing gem ... (Gem::InvalidSpecificationException)
+  # rdoc_options must be an Array of String
+  # with bundler 1.0.14
+  # ##################################################
+  #s.rdoc_options = '--title' << s.name <<
+  #                  '--main'  << 'README.md' << '--show-hash' <<
+  #                  `git ls-files -- lib/*`.split("\n") <<
+  #                  'README.md' << 'LICENSE' << 'CREDITS.md'
 end
